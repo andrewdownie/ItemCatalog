@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/bootstrap.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/app.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/styles.css') }}">
+        <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+
+
+        {% include 'navbar.html' %}
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div id="my-items-col" class="col-md-12">
+                    <h2 class="page-header">Manage my items</h2>
+                    <div class="row">
+
+                        {% for item in items%}
+
+                            <div class="item-card col-md-4" id="itemid-{{ item['id'] }}">
+                                <h3 class="page-header">{{ item['item_name'] }}</h3>
+                                <h4 class="item-category pull-right text-right">Category: {{ item['category_name'] }}</h4>
+                                <h4>Description:</h4>
+                                <p class="item-desc">{{ item['desc'] }}</p>
+                                <button class="btn btn-primary">Edit</button>
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div><!-- container -->
+
+    </body>
+</html>

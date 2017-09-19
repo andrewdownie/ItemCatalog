@@ -13,23 +13,29 @@
     <body>
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
-                    <h2>All Categories</h2>
+
+                <div id="all-categories-col" class="col-md-4">
+                    <h2 class="page-header">All Categories</h2>
+                    {% for category in categories%}
+                        <h3><a href="#">{{ category['category_name'] }}</a></h3>
+                    {% endfor %}
+                    <br>
+                    <br>
                 </div>
-                <div class="col-md-8">
-                    <h2>Recent Items</h2>
+
+                <div id="recent-items-col" class="col-md-8">
+                    <h2 class="page-header">Recent Items</h2>
+                    {% for item in items%}
+                        <h4><a href="#">{{ item['item_name'] }}</a></h4>
+                        Category: {{ item['category_name'] }}
+                        <br/>
+                        <br/>
+                    {% endfor %}
                 </div>
 
             </div>
 
 
-
-
-        {{ body_content }}
-
-        {% for meow in meows %}
-            <h1 style="color:red">{{ meow['meow_name'] }}</h1>
-        {% endfor %}
 
         </div><!-- container -->
 
