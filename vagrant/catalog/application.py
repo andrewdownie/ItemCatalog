@@ -4,7 +4,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return render_template('index.html', body_content="fart")
+    meow_meow = [{"meow_name": "al"}, {"meow_name": "jess"}]
+    return render_template('index.html', body_content="<h1>fart</h1>", meows=meow_meow)
 
 
 #return app.send_static_file('index.html')
