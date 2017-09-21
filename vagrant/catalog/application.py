@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import psycopg2
+import json
 
 from flask import Flask
 from flask import render_template 
@@ -44,5 +45,32 @@ def manage_items():
 
     return render_template('manage.html', items=mock_items)
 
+
+def connect_to_db(db_name):
+    try:
+        conn = psycopg2.connect('dbname=' + str(db_name))
+        cursor = conn.cursor()
+        return conn, cursor
+    except:
+        print("Error connecting to database...")
+
+
+@app.route("/items")
+def get_items():
+    conn, cursor = connect_to_db("item_catalog")
+
+    cursor.execute("SELECT * FROM items LIMIT 10;")
+
+    #array_to_json(array_agg(t))
+    json_string = json.dumps(cursor.fetchall())
+    print(json_string)
+
+    conn.close()
+
+    return json_string
+
+  
+
 if __name__ == '__main__':
+  get_items()
   app.run(host='0.0.0.0', port=8000)
