@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+import psycopg2
+
 from flask import Flask
 from flask import render_template 
 app = Flask(__name__)
@@ -8,6 +12,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 def view_items():
 
     mock_categories = [
+      {"category_name": "Recent Items"},
       {"category_name": "Tools"},
       {"category_name": "Food"},
       {"category_name": "Kitchen"}
@@ -29,6 +34,11 @@ def view_items():
 def manage_items():
 
     mock_items = [
+      {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"},
+      {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"},
+      {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"},
+      {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"},
+      {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"},
       {"item_name": "Taco", "category_name": "Food", "id": "abcid", "desc": "This... this is a taco, what else do you really really really really need to know?"}
     ]
 

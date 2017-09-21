@@ -5,6 +5,7 @@
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/styles.css') }}">
         <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
         <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/manage.js') }}"></script>
 
 
         {% include 'navbar.html' %}
@@ -16,15 +17,22 @@
                 <div id="my-items-col" class="col-md-12">
                     <h2 class="page-header">Manage my items</h2>
                     <div class="row">
+                        <div class="col-xs-12">
+                            <button id="add-item" class="btn btn-primary">Add Item</button>
+                        </div>
+                    </div>
+                    <div class="row">
 
                         {% for item in items%}
 
-                            <div class="item-card col-md-4" id="itemid-{{ item['id'] }}">
-                                <h3 class="page-header">{{ item['item_name'] }}</h3>
-                                <h4 class="item-category pull-right text-right">Category: {{ item['category_name'] }}</h4>
-                                <h4>Description:</h4>
-                                <p class="item-desc">{{ item['desc'] }}</p>
-                                <button class="btn btn-primary">Edit</button>
+                            <div class="item-card-container col-md-4" id="itemid-{{ item['id'] }}">
+                                <div class="item-card col-xs-12">
+                                    <h3 class="page-header">{{ item['item_name'] }}</h3>
+                                    <h4 class="item-category pull-right text-right">Category: {{ item['category_name'] }}</h4>
+                                    <h4>Description:</h4>
+                                    <p class="item-desc">{{ item['desc'] }}</p>
+                                    <button class="btn btn-primary edit-item">Edit</button>
+                                </div>
                             </div>
 
                         {% endfor %}
@@ -36,6 +44,80 @@
 
 
         </div><!-- container -->
+
+        <!-- Add Item Modal-->
+        <div class="modal fade" id="add-item-modal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Item</h4>
+                    </div>
+
+                    <div class="modal-body form-group row">
+                        <label for="item-category" class="col-xs-4">Name:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-name" id="add-item-name">
+                        </div>
+                        <label for="item-category" class="col-xs-4">Category:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-category" id="add-item-category">
+                        </div>
+                        <div class="col-xs-12 text-left">
+                            <label for="comment">Description:</label>
+                            <textarea class="form-control" rows="5" id="add-item-description"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="row">
+
+                            <div class="col-xs-12 text-right modal-label">
+                                <button type="button" class="btn btn-primary" id="confirm-add-item" data-dismiss="modal">Add Item</button>
+                                <button type="button" class="btn btn-default" id="confirm-add-item" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Item Modal-->
+        <div class="modal fade" id="edit-item-modal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Edit Item</h4>
+                    </div>
+
+                    <div class="modal-body form-group row">
+                        <label for="item-category" class="col-xs-4">Name:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-name" id="edit-item-name">
+                        </div>
+                        <label for="item-category" class="col-xs-4">Category:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-category" id="edit-item-category">
+                        </div>
+                        <div class="col-xs-12 text-left">
+                            <label for="comment">Description:</label>
+                            <textarea class="form-control" rows="5" id="edit-item-description"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="row">
+
+                            <div class="col-xs-12 text-right modal-label">
+                                <button type="button" class="btn btn-warning" id="confirm-add-item" data-dismiss="modal">Edit Item</button>
+                                <button type="button" class="btn btn-default" id="confirm-add-item" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </body>
 </html>

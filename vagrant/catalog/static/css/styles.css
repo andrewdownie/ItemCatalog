@@ -12,10 +12,16 @@ body{
     margin-top: 0;
 }
 
-.item-card{
+.item-card-container{
     height: 230px;
-    position: relative;
+    margin-top: 30px;
+}
+
+.item-card{
+    height: 100%;
     background-color: #f6f6f6;
+    border-top: solid #eee 1px;
+    position: relative;
 }
 
 .item-card h3{
