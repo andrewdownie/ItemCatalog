@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/app.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/styles.css') }}">
+        <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+
+
+        {% include 'navbar.html' %}
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-xs-offset-4 col-xs-4">
+                    <div class="page-header">
+                        <h2>Login to your account</h2>
+                    </div>
+                </div>
+
+                <div class="col-xs-offset-4 col-xs-4">
+                    <div class="modal-body form-group row">
+                        <label for="item-category" class="col-xs-4">Username:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-name" id="login-username">
+                        </div>
+                        <label for="item-category" class="col-xs-4">Password:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-category" id="login-password">
+                        </div>
+                        <button style="margin-top: 10px;" type="button" class="btn btn-primary pull-right" id="login">Login</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-xs-offset-4 col-xs-4">
+                    <div class="page-header">
+                        <h2>Create an account</h2>
+                    </div>
+                </div>
+
+                <div class="col-xs-offset-4 col-xs-4">
+                    <div class="modal-body form-group row">
+                        <label for="item-category" class="col-xs-4">Email:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-name" id="sign-up-email">
+                        </div>
+                        <label for="item-category" class="col-xs-4">Username:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-name" id="sign-up-username">
+                        </div>
+                        <label for="item-category" class="col-xs-4">Password:</label>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" name="item-category" id="sign-up-password">
+                        </div>
+                        <button style="margin-top: 10px;" type="button" class="btn btn-primary pull-right" id="sign-up">Sign up</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- container -->
+
+    </body>
+</html>

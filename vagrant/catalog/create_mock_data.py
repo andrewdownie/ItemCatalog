@@ -5,8 +5,8 @@ import random
 
 
 MOCK_ITEM = """
-INSERT INTO items (name, category_id, description, id)
-VALUES (%(name)s, %(category_id)s, %(description)s, %(id)s); 
+INSERT INTO items (name, category_id, description, date_created, id)
+VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(id)s); 
 """
 
 
@@ -23,7 +23,8 @@ def InsertMockItems(count):
     for i in range(1, count):
         id = random.randint(1, 1000000)
         item_name = "item name " + str(id)
-        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": 1234, "description": "this is test item desc", "id": id})
+        date = "2007-12-31"
+        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": 1234, "description": "this is test item desc", "date_created": date, "id": id})
 
     conn.commit()
     conn.close()
@@ -52,5 +53,5 @@ def connect_to_db(db_name):
 
 
 if __name__ == '__main__':
-    #InsertMockItems(10)
-    InsertMockCategories(4)
+    InsertMockItems(10)
+    #InsertMockCategories(4)

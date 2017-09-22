@@ -13,6 +13,7 @@ CREATE TABLE items(
     name text,
     category_id integer,
     description text,
+    date_created date,
     id integer NOT NULL
 );
 

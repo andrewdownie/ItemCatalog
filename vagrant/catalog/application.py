@@ -8,6 +8,12 @@ from flask import render_template
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+#####
+#####
+#####                   Html Routing
+#####
+#####
+
 @app.route("/")
 @app.route("/index.html")
 def view_items():
@@ -19,17 +25,7 @@ def view_items():
       {"category_name": "Kitchen"}
     ]
 
-
-    mock_items = [
-      {"item_name": "Hammer",   "category_name": "Tools"},
-      {"item_name": "Apple",   "category_name": "Food"},
-      {"item_name": "Banana",   "category_name": "Food"},
-      {"item_name": "Pear",   "category_name": "Food"},
-      {"item_name": "Blender", "category_name": "Kitchen"}
-    ]
-
-
-    return render_template('index.html', categories=mock_categories, items=mock_items)
+    return render_template('index.html', categories=mock_categories, items=get_recent_items())
 
 @app.route("/manage.html")
 def manage_items():
@@ -45,6 +41,9 @@ def manage_items():
 
     return render_template('manage.html', items=mock_items)
 
+@app.route("/login.html")
+def login():
+    return render_template('login.html')
 
 def connect_to_db(db_name):
     try:
@@ -55,21 +54,56 @@ def connect_to_db(db_name):
         print("Error connecting to database...")
 
 
-@app.route("/items")
+#####
+#####
+#####                   Rest API
+#####
+#####
+
+@app.route("/items", methods=["GET"])
 def get_items():
     conn, cursor = connect_to_db("item_catalog")
+    cursor.execute("SELECT name, category_id, description, CAST(date_created AS TEXT), id FROM items LIMIT 10;")
 
-    cursor.execute("SELECT * FROM items LIMIT 10;")
-
-    #array_to_json(array_agg(t))
     json_string = json.dumps(cursor.fetchall())
+
+    conn.close()
+    return json_string
+
+
+@app.route("/recent-items", methods=["GET"])
+def get_recent_items():
+    conn, cursor = connect_to_db("item_catalog")
+    cursor.execute("""
+    SELECT items.name, category.name, description, CAST(date_created AS TEXT), items.id 
+    FROM items 
+    INNER JOIN category
+    ON category_id = category.id
+    ORDER BY date_created LIMIT 10;
+    """)
+
+    json_string = list(cursor.fetchall())
+    #rows = cursor.fetchall()
+    #json.dumps([dict(ix) for ix in rows])
     print(json_string)
 
     conn.close()
-
     return json_string
 
-  
+
+@app.route("/category", methods=["GET"])
+def get_category():
+    conn, cursor = connect_to_db("item_catalog")
+    cursor.execute("SELECT * FROM category LIMIT 10;")
+
+    json_string = json.dumps(cursor.fetchall())
+
+    conn.close()
+    return json_string
+
+
+
+
 
 if __name__ == '__main__':
   get_items()
