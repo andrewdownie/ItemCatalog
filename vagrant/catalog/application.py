@@ -88,7 +88,7 @@ def get_items():
 
     fetchAll= cursor.fetchall()
     results = fetchAll[0][0]
-    print(results)
+    #print(results)
 
     conn.close()
     return results 
@@ -100,6 +100,25 @@ def get_recent_items():
     cursor.execute(
     """
     SELECT json_agg(json_build_object(
+        'item_name', recent_items.item_name, 
+        'category_name', recent_items.category_name, 
+        'description', recent_items.description,
+        'date_created', CAST(recent_items.date_created AS TEXT), 
+        'item_id', recent_items.id))
+    FROM 
+        (SELECT 
+            items.name AS item_name, category.name AS category_name, description, date_created, items.id
+            FROM items
+            INNER JOIN category
+            ON category_id = category.id
+            ORDER BY date_created LIMIT 10
+        ) AS recent_items
+    """)
+
+
+    # Original sql
+    """
+    SELECT json_agg(json_build_object(
         'item_name', items.name, 
         'category_name', 'DEFAULT_CAT_NAME',
         'description', description,
@@ -109,13 +128,14 @@ def get_recent_items():
     INNER JOIN category
     ON category_id = category.id
     ORDER BY date_created LIMIT 10;
-    """)
+    """
 
-    json_string = list(cursor.fetchall())
-    print(json_string)
+    fetchAll = cursor.fetchall()
+    results = fetchAll[0][0]
+    print(results)
 
     conn.close()
-    return json_string
+    return results 
 
 
 @app.route("/category", methods=["GET"])
