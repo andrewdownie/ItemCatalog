@@ -34,12 +34,6 @@ body{
     text-indent: 20px;
 }
 
-.item-category{
-    position: absolute;
-    top: 5px;
-    right: 15px;
-}
-
 .item-card button{
     position: absolute;
     width: 100%;
