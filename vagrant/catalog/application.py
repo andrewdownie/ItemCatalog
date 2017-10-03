@@ -30,15 +30,11 @@ def login():
     return render_template('login.html')
 
 
-
-
 #####
 #####
-#####                   Rest API
+#####                   Database functions
 #####
 #####
-
-@app.route("/catalog/items", methods=["GET"])
 def get_items():
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
@@ -63,7 +59,6 @@ def get_items():
     conn.close()
     return results 
 
-@app.route("/catalog/<category_name>/items", methods=["GET"])
 def get_category_items(category_name):
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
@@ -88,10 +83,8 @@ def get_category_items(category_name):
     print("Printing get cetegory items results")
     print(results)
 
-    return json.dumps(results)
- 
+    return results
 
-@app.route("/catalog/<category_name>/<item_name>", methods=["GET"])                                                    
 def get_single_item(category_name, item_name):
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
@@ -133,8 +126,6 @@ def get_single_item(category_name, item_name):
 
     return results
 
-
-@app.route("/recent-items", methods=["GET"])
 def get_recent_items():
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
@@ -167,8 +158,6 @@ def get_recent_items():
 
     return results 
 
-
-@app.route("/catalog/categories", methods=["GET"])
 def get_categories():
     conn, cursor = connect_to_db("item_catalog")
 
@@ -187,6 +176,31 @@ def get_categories():
 
     conn.close()
     return results
+
+#####
+#####
+#####                   Rest API
+#####
+#####
+@app.route("/catalog/items", methods=["GET"])
+def rest_get_items():
+    return json.dumps(get_items())
+
+@app.route("/catalog/<category_name>/items", methods=["GET"])
+def rest_get_category_items(category_name):
+    return json.dumps(get_category_items(category_name))
+
+@app.route("/catalog/<category_name>/<item_name>", methods=["GET"])                                                    
+def rest_get_single_item(category_name, item_name):
+    return json.dumps(get_single_item(category_name, item_name))
+
+@app.route("/recent-items", methods=["GET"])
+def rest_get_recent_items():
+    return json.dumps(get_recent_items())
+
+@app.route("/catalog/categories", methods=["GET"])
+def rest_get_categories():
+    return json.dumps(get_categories())
 
 
 #####

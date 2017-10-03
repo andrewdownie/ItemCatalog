@@ -18,11 +18,11 @@ $(document).ready(function(){
             type: 'GET',
             url: rest_url, 
             success: function(data){
-                console.log("Request items of category success")
+                console.log("Request items of category: success")
                 console.log(data)
             },
             error: function(data){
-                console.log("Request items of category failure");
+                console.log("Request items of category: failure");
                 console.log(data);
             },
         });
