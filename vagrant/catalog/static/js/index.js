@@ -4,8 +4,6 @@ $(document).ready(function(){
     $("#all-categories-col").on("click", ".category-link", function(){
         var cat_id = this.id;
         var cat_name = $(this).text().trim()
-        alert(cat_name)
-
 
         rest_url = "/catalog/" + cat_name + "/items"
 
@@ -19,7 +17,14 @@ $(document).ready(function(){
             url: rest_url, 
             success: function(data){
                 console.log("Request items of category: success")
-                console.log(data)
+                $("#items-header").text(cat_name)
+
+                $("#items-container").empty()
+                for(i = 0; i < data.length; i++){
+                    item = ItemTemplate(data[i]);
+                    $("#items-container").append(item)
+                }
+
             },
             error: function(data){
                 console.log("Request items of category: failure");
@@ -32,3 +37,18 @@ $(document).ready(function(){
 
 
 });
+
+
+function ItemTemplate(itemRow){
+    var item = `
+    <h4><a href="#">{item_name}</a></h4>
+    Category: {category_name} 
+    <br/>
+    <br/>
+    `;
+
+    item = item.replace("{item_name}", itemRow['item_name']);
+    item = item.replace("{category_name}", itemRow['category_name']);
+
+    return item;
+}
