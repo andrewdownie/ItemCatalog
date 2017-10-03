@@ -145,9 +145,11 @@ def get_recent_items():
     FROM 
         (SELECT                                             -- 1) Select the items we need
             items.name AS item_name, 
+            items.description,
+            items.date_created,
+            items.id,
             category.name AS category_name,
-            description, date_created,
-            items.id
+            category.description AS category_description
             FROM items
             INNER JOIN category
                 ON category_id = category.id

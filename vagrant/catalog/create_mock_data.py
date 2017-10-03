@@ -2,6 +2,7 @@
 
 import psycopg2
 import random
+import sys
 
 
 MOCK_ITEM = """
@@ -11,20 +12,27 @@ VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(id)s);
 
 
 MOCK_CATEGORY = """
-INSERT INTO category (name, id)
-VALUES (%(name)s, %(id)s);
+INSERT INTO category (name, description, id)
+VALUES (%(name)s, %(description)s, %(id)s);
 """
 
 
 def InsertMockItems(count):
     conn, cursor = connect_to_db('item_catalog')
+    print("Getting the current category id's")
+    cursor.execute("SELECT json_agg(json_build_object('id', id)) FROM category")
+    categoryIDs = cursor.fetchall()[0][0]
+    categoryCount = len(categoryIDs)
+    print(categoryIDs)
 
     print("Inserting " + str(count) + " mock items...")
     for i in range(1, count):
         id = random.randint(1, 1000000)
+        category_id = random.randint(0, categoryCount - 1)
         item_name = "item name " + str(id)
         date = "2007-12-31"
-        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": 1234, "description": "this is test item desc", "date_created": date, "id": id})
+        print(categoryIDs[category_id]['id'])
+        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "id": id})
 
     conn.commit()
     conn.close()
@@ -33,11 +41,13 @@ def InsertMockItems(count):
 def InsertMockCategories(count):
     conn, cursor = connect_to_db('item_catalog')
 
+
     print("Inserting " + str(count) +  " mock categories...")
     for i in range(1, count):
         id = random.randint(1, 1000000)
-        category_name = "item name " + str(id)
-        cursor.execute(MOCK_CATEGORY, {"name": category_name, "id": id})
+        category_name = "category name " + str(id)
+        category_description = " category desc " + str(id)
+        cursor.execute(MOCK_CATEGORY, {"name": category_name, "description": category_description, "id": id})
 
     conn.commit()
     conn.close()
@@ -53,5 +63,36 @@ def connect_to_db(db_name):
 
 
 if __name__ == '__main__':
-    InsertMockItems(10)
-    #InsertMockCategories(4)
+    print("\n")
+    if(len(sys.argv) > 3):
+        print("Too many arguments")
+        print("\nexiting...\n")
+        sys.exit()
+
+    if(len(sys.argv) < 2):
+        print("First argument of program missing:")
+        print("    enter an integer to choose how many items to add")
+        print("\nexiting...\n")
+        sys.exit()
+
+    if(len(sys.argv) < 3):
+        print("Second argument of program missing, available options are:")
+        print("    category")
+        print("    item")
+        print("\nexiting...\n")
+        sys.exit()
+
+    print("Correct number of arguments entered\n")
+
+    amount_to_add = int(sys.argv[1])
+    type_to_add = sys.argv[2]
+    print("First arg is: " + str(amount_to_add))
+    print("Second arg is: " + str(type_to_add))
+    print("")
+
+    if(type_to_add == "item"):
+        InsertMockItems(amount_to_add)
+    elif(type_to_add == "category"):
+        InsertMockCategories(amount_to_add)
+
+    print("")
