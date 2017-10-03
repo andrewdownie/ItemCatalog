@@ -29,7 +29,7 @@ def InsertMockItems(count):
     for i in range(1, count):
         id = random.randint(1, 1000000)
         category_id = random.randint(0, categoryCount - 1)
-        item_name = "item name " + str(id)
+        item_name = "item_name_" + str(id)
         date = "2007-12-31"
         print(categoryIDs[category_id]['id'])
         cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "id": id})
@@ -45,7 +45,7 @@ def InsertMockCategories(count):
     print("Inserting " + str(count) +  " mock categories...")
     for i in range(1, count):
         id = random.randint(1, 1000000)
-        category_name = "category name " + str(id)
+        category_name = "category_name_" + str(id)
         category_description = " category desc " + str(id)
         cursor.execute(MOCK_CATEGORY, {"name": category_name, "description": category_description, "id": id})
 

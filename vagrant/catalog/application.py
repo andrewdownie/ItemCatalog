@@ -44,14 +44,16 @@ def get_items():
     cursor.execute(
         """
         SELECT json_agg(json_build_object(
-            'item_name', name, 
-            'category_name', 'DEFAULT_CAT_NAME',
+            'item_name', items.name, 
+            'category_name', category.name,
             'category_id', category_id, 
-            'description', description,
+            'description', items.description,
             'date', CAST(date_created AS TEXT), 
-            'item_id', id
+            'item_id', items.id
         ))
-        FROM items;
+        FROM items
+        INNER JOIN category
+        ON items.category_id = category.id;
         """
     )
 
@@ -61,22 +63,24 @@ def get_items():
     conn.close()
     return results 
 
-@app.route("/catalog/<category>/items", methods=["GET"])
-def get_category_items(category):
+@app.route("/catalog/<category_name>/items", methods=["GET"])
+def get_category_items(category_name):
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
     """
     SELECT json_agg(json_build_object(
         'item_name', items.name,
-        'category_name', items.category_id,
+        'category_name', category.name,
         'description', items.description,
         'date_created', CAST(items.date_created AS TEXT),
         'item_id', items.id
     ))
     FROM items
-    WHERE category_id=%(category)s;
+    INNER JOIN category
+    ON category.id = items.category_id
+    WHERE category.name=%(category_name)s;
     """,
-    {'category' : category})
+    {'category_name' : category_name})
 
     results = strip_containers(cursor.fetchall())
     cursor.close()
@@ -84,7 +88,7 @@ def get_category_items(category):
     print("Printing get cetegory items results")
     print(results)
 
-    return results
+    return json.dumps(results)
  
 
 @app.route("/catalog/<category_name>/<item_name>", methods=["GET"])                                                    
