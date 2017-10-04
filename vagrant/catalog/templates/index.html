@@ -36,10 +36,12 @@
                     <h2 class="page-header" id="items-header">Recent Items</h2>
                     <div id="items-container">
                     {% for item in items%}
-                        <h4><a href="#">{{ item['item_name'] }}</a></h4>
-                        Category: {{ item['category_name'] }}
-                        <br/>
-                        <br/>
+                        <div>
+                            <a href="#" id="{{ item['item_id'] }}" class="item-link"><h4>{{ item['item_name'] }}</h4></a>
+                            Category: <span class="item-category">{{ item['category_name'] }}</span>
+                            <br/>
+                            <br/>
+                        </div>
                     {% endfor %}
                     </div>
                 </div>

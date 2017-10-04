@@ -188,11 +188,15 @@ def rest_get_items():
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
 def rest_get_category_items(category_name):
-    return json.dumps(get_category_items(category_name))
+    return render_template('index.html', categories=get_categories(), items=get_category_items(category_name))
+    #return json.dumps(get_category_items(category_name))
+
 
 @app.route("/catalog/<category_name>/<item_name>", methods=["GET"])                                                    
 def rest_get_single_item(category_name, item_name):
-    return json.dumps(get_single_item(category_name, item_name))
+    print(get_single_item(category_name, item_name))
+    return render_template('item.html', single_item=get_single_item(category_name, item_name))
+    #return json.dumps(get_single_item(category_name, item_name))
 
 @app.route("/recent-items", methods=["GET"])
 def rest_get_recent_items():
