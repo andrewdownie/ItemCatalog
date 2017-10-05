@@ -4,7 +4,29 @@ import psycopg2
 import json
 
 from flask import Flask
-from flask import render_template 
+from flask import render_template
+
+# From oauth tutorial
+from flask import request
+from flask import redirect
+from flask import jsonify
+from flask import url_for
+from flask import flash
+from flask import session as login_session
+from flask import make_response
+
+from sqlalchemy import create_engine, asc
+from sqlalchemy.orm import sessionmaker
+# from database_setup import Base, Restaurant, MenuItem, User
+import random
+import string
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+import requests
+
+
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -37,7 +59,7 @@ def manage_items():
     return render_template('manage.html', items=get_items())
 
 
-@app.route("/login.html")
+@app.route("/login")
 def login():
     return render_template('login.html')
 
