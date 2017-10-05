@@ -41,6 +41,9 @@
             // Hide the sign-in button now that the user is authorized
             $('#signinButton').attr('style', 'display: none');
             // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+
+            console.log("Going to ajax to our own back end now... and probably get a 500")
+            //TODO: for some reason, 
             $.ajax({
                 type: 'POST',
                 url: '/gconnect?state={{STATE}}',

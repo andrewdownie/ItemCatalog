@@ -30,6 +30,10 @@ import requests
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = "FSND Item Catalog Client ID"
+
+
 
 #####
 #####
@@ -57,11 +61,6 @@ def view_single_item(category_name, item_name):
 @app.route("/manage.html")
 def manage_items():
     return render_template('manage.html', items=get_items())
-
-
-@app.route("/login")
-def login():
-    return render_template('login.html')
 
 
 #####
@@ -273,6 +272,8 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    print("Running gconnect")
+
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -425,4 +426,5 @@ def gdisconnect():
 #####
 #####
 if __name__ == '__main__':
+    app.secret_key = 'super_secret_key'
     app.run(host='0.0.0.0', port=8000)
