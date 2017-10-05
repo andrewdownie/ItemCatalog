@@ -20,7 +20,12 @@
             <div class="row">
 
                 <div id="all-categories-col" class="col-md-4">
-                    <h2 class="page-header" id="category-header">All Categories</h2>
+                    <h2 class="page-header" id="category-header">Categories</h2>
+                        <h3>
+                            <a href="/index.html">
+                                Recent Items
+                            </a>
+                        </h3>
                     {% for category in categories%}
                         <h3>
                             <a class="category-link" id="{{ category['category_id'] }}" href="#">
@@ -33,7 +38,7 @@
                 </div>
 
                 <div id="items-col" class="col-md-8">
-                    <h2 class="page-header" id="items-header">Recent Items</h2>
+                    <h2 class="page-header" id="items-header">{{ current_category }}</h2>
                     <div id="items-container">
                     {% for item in items%}
                         <div>

@@ -25,6 +25,12 @@ def InsertMockItems(count):
     categoryCount = len(categoryIDs)
     print(categoryIDs)
 
+
+    if(categoryCount == 0):
+        print("\nThere are currently no categories for items to randomly associate to, please add some categories first.")
+        print("\nexiting...\n")
+        sys.exit()
+
     print("Inserting " + str(count) + " mock items...")
     for i in range(1, count):
         id = random.randint(1, 1000000)
@@ -71,7 +77,7 @@ if __name__ == '__main__':
 
     if(len(sys.argv) < 2):
         print("First argument of program missing:")
-        print("    enter an integer to choose how many items to add")
+        print("    enter an integer to choose how many items/categories to add")
         print("\nexiting...\n")
         sys.exit()
 
