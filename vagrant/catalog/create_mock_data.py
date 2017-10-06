@@ -6,8 +6,8 @@ import sys
 
 
 MOCK_ITEM = """
-INSERT INTO items (name, category_id, description, date_created, id)
-VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(id)s); 
+INSERT INTO item (name, category_id, description, date_created, user_id, id)
+VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s, %(id)s); 
 """
 
 
@@ -38,7 +38,7 @@ def InsertMockItems(count):
         item_name = "item_name_" + str(id)
         date = "2007-12-31"
         print(categoryIDs[category_id]['id'])
-        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "id": id})
+        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "user_id": 69, "id": id})
 
     conn.commit()
     conn.close()

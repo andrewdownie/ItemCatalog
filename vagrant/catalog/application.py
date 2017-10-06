@@ -17,7 +17,6 @@ from flask import make_response
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-# from database_setup import Base, Restaurant, MenuItem, User
 import random
 import string
 from oauth2client.client import flow_from_clientsecrets
@@ -25,6 +24,8 @@ from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 import requests
+
+from database_setup import Base, Item, Category, User
 
 
 app = Flask(__name__)
@@ -366,7 +367,7 @@ def gconnect():
 
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+                   'email'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
