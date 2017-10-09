@@ -63,9 +63,11 @@ def oauth2callback():
     auth_code = flask.request.args.get('code')
     credentials = flow.step2_exchange(auth_code)
     flask.session['credentials'] = credentials.to_json()
-    email = json.loads(flask.session['credentials'])['id_token']['email']
-    print("email is: " + email)
-    return flask.redirect(flask.url_for('index'))
+
+    #TODO: this is an example for how to get the users email
+    #email = json.loads(flask.session['credentials'])['id_token']['email']
+    #print("email is: " + email)
+    return flask.redirect(flask.url_for('view_recent_items'))
 
 
 @app.route("/")
