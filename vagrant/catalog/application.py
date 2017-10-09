@@ -3,16 +3,17 @@
 import psycopg2
 import json
 
-from flask import Flask
+import flask
 from flask import render_template
 
 # From oauth tutorial
+"""
 from flask import request
 from flask import redirect
 from flask import jsonify
 from flask import url_for
 from flask import flash
-from flask import session as login_session
+#from flask import session as login_session
 from flask import make_response
 
 from sqlalchemy import create_engine, asc
@@ -21,18 +22,24 @@ import random
 import string
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import httplib2
+#import httplib2
 import json
 import requests
+"""
 
-from database_setup import Base, Item, Category, User
+
+# From google's tutorials
+import httplib2
+
+from apiclient import discovery #pip install google-api-python-client
+from oauth2client import client
 
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = "FSND Item Catalog Client ID"
+#CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+#APPLICATION_NAME = "FSND Item Catalog Client ID"
 
 
 
@@ -41,12 +48,40 @@ APPLICATION_NAME = "FSND Item Catalog Client ID"
 #####                   Html Routing
 #####
 #####
+@app.route('/oauth2callback')
+def oauth2callback():
+  flow = client.flow_from_clientsecrets(
+      'client_secrets.json',
+      scope='https://www.googleapis.com/auth/drive.metadata.readonly',
+      redirect_uri=flask.url_for('oauth2callback', _external=True))
+      #deleted include granted scopes
+  if 'code' not in flask.request.args:
+    auth_uri = flow.step1_get_authorize_url()
+    return flask.redirect(auth_uri)
+  else:
+    auth_code = flask.request.args.get('code')
+    credentials = flow.step2_exchange(auth_code)
+    flask.session['credentials'] = credentials.to_json()
+    return flask.redirect(flask.url_for('index'))
 
 
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
-    return render_template('index.html', current_category="Recent Items", categories=get_categories(), items=get_recent_items())
+    #TODO: flask.session cannot be found... I don't know how to import this properly
+    if 'credentials' not in flask.session:
+        return flask.redirect(flask.url_for('oauth2callback'))
+    credentials = client.OAuth2Credentials.from_json(flask.session['credentials'])
+    if credentials.access_token_expired:
+        return flask.redirect(flask.url_for('oauth2callback'))
+    else:
+        http_auth = credentials.authorize(httplib2.Http())
+        drive = discovery.build('drive', 'v2', http_auth)
+        files = drive.files().list().execute()
+        return json.dumps(files)
+
+    #TODO: this is what I had before
+    #return render_template('index.html', current_category="Recent Items", categories=get_categories(), items=get_recent_items())
 
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
@@ -283,5 +318,8 @@ def showLogin():
 #####
 #####
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
+    #TODO: this is directy from the google guides
+    import uuid
+    app.secret_key = str(uuid.uuid4())
+  
     app.run(host='0.0.0.0', port=8000)
