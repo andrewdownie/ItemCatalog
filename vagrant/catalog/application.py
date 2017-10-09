@@ -50,9 +50,10 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 #####
 @app.route('/oauth2callback')
 def oauth2callback():
+    #TODO: the only scope I should need is to get the users email ---
   flow = client.flow_from_clientsecrets(
       'client_secrets.json',
-      scope='https://www.googleapis.com/auth/drive.metadata.readonly',
+      scope='https://www.googleapis.com/auth/userinfo.email',
       redirect_uri=flask.url_for('oauth2callback', _external=True))
       #deleted include granted scopes
   if 'code' not in flask.request.args:
@@ -62,6 +63,8 @@ def oauth2callback():
     auth_code = flask.request.args.get('code')
     credentials = flow.step2_exchange(auth_code)
     flask.session['credentials'] = credentials.to_json()
+    email = json.loads(flask.session['credentials'])['id_token']['email']
+    print("email is: " + email)
     return flask.redirect(flask.url_for('index'))
 
 
