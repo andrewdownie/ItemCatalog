@@ -50,12 +50,11 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 #####
 @app.route('/oauth2callback')
 def oauth2callback():
-    #TODO: the only scope I should need is to get the users email ---
   flow = client.flow_from_clientsecrets(
       'client_secrets.json',
       scope='https://www.googleapis.com/auth/userinfo.email',
       redirect_uri=flask.url_for('oauth2callback', _external=True))
-      #deleted include granted scopes
+      #deleted 'include granted scopes'
   if 'code' not in flask.request.args:
     auth_uri = flow.step1_get_authorize_url()
     return flask.redirect(auth_uri)
@@ -63,45 +62,41 @@ def oauth2callback():
     auth_code = flask.request.args.get('code')
     credentials = flow.step2_exchange(auth_code)
     flask.session['credentials'] = credentials.to_json()
-
-    #TODO: this is an example for how to get the users email
-    #email = json.loads(flask.session['credentials'])['id_token']['email']
-    #print("email is: " + email)
     return flask.redirect(flask.url_for('view_recent_items'))
 
 
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
-    #TODO: flask.session cannot be found... I don't know how to import this properly
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('oauth2callback'))
     credentials = client.OAuth2Credentials.from_json(flask.session['credentials'])
+
     if credentials.access_token_expired:
         return flask.redirect(flask.url_for('oauth2callback'))
     else:
         http_auth = credentials.authorize(httplib2.Http())
+        """
         drive = discovery.build('drive', 'v2', http_auth)
         files = drive.files().list().execute()
         return json.dumps(files)
-
-    #TODO: this is what I had before
-    #return render_template('index.html', current_category="Recent Items", categories=get_categories(), items=get_recent_items())
+        """
+        return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
 
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
 def view_category_items(category_name):
-    return render_template('index.html', current_category=category_name, categories=get_categories(), items=get_category_items(category_name))
+    return render_template('index.html', active_link="index", user_email=get_user_email(), current_category=category_name, categories=get_categories(), items=get_category_items(category_name))
 
 
 @app.route("/catalog/<category_name>/<item_name>", methods=["GET"])                                                    
 def view_single_item(category_name, item_name):
-    return render_template('item.html', single_item=get_single_item(category_name, item_name))
+    return render_template('item.html', active_link="index", user_email=get_user_email(), single_item=get_single_item(category_name, item_name))
 
 
 @app.route("/manage.html")
 def manage_items():
-    return render_template('manage.html', items=get_items())
+    return render_template('manage.html', active_link="manage", user_email=get_user_email(), items=get_items())
 
 
 #####
@@ -296,6 +291,12 @@ def strip_containers(cursor_fetchall):
     json_agg(json_build_object(...))
     """
     return cursor_fetchall[0][0]
+
+
+def get_user_email():
+    if 'credentials' in flask.session:
+        return json.loads(flask.session['credentials'])['id_token']['email']
+    return None
 
 
 #####

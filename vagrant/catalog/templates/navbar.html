@@ -14,17 +14,46 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="/index.html">View Items</a>
+                    <li
+                    {%if(active_link == "index")%}
+                        class="active"
+                    {%endif%}>
+                        <a href="/index.html" >
+                            View Items
+                        </a>
                     </li>
-                    <li>
-                        <a href="/manage.html">Manage Items</a>
+                    <li
+                    {%if(active_link == "manage")%}
+                        class="active"
+                    {%endif%}>
+                        <a href="/manage.html">
+                            Manage Items
+                        </a>
                     </li>
 
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/login" id="log-in-out">Login \ Sign up</a></li>
+                <ul class="nav navbar-nav navbar-right" role="menu">
+                    {%if(user_email)%}
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" id="logout" role="button" data-toggle="dropdown" data-target="#" href="#">
+                                {{ user_email }}
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <li><a href="#">Logout</a></li>
+                            </ul>
+                        </li>
+                    {%else%}
+                        <li>
+                            <a href="/oauth2callback" id="login">
+                                Login
+                            </a>
+                        </li>
+                    {%endif%}
                 </ul>
+
+
+
             </div>
             <!-- /.navbar-collapse -->
         </div>
