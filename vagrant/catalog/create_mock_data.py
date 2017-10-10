@@ -17,17 +17,32 @@ VALUES (%(name)s, %(description)s, %(id)s);
 """
 
 
+MOCK_USER = """
+INSERT INTO users (name, email, id)
+VALUES (%(name)s, %(email)s, %(id)s);
+"""
+
+
 def InsertMockItems(count):
     conn, cursor = connect_to_db('item_catalog')
     print("Getting the current category id's")
     cursor.execute("SELECT json_agg(json_build_object('id', id)) FROM category")
     categoryIDs = cursor.fetchall()[0][0]
     categoryCount = len(categoryIDs)
-    print(categoryIDs)
+    #print(categoryIDs)
+
+    print("Getting the current user id's")
+    cursor.execute("SELECT json_agg(json_build_object('id', id)) FROM users")
+    userIDs = cursor.fetchall()[0][0]
+    userCount = len(categoryIDs)
 
 
     if(categoryCount == 0):
-        print("\nThere are currently no categories for items to randomly associate to, please add some categories first.")
+        print("\nthere are currently no categories for items to randomly associate to, please add some categories first.")
+        print("\nexiting...\n")
+        sys.exit()
+    if(userCount == 0):
+        print("\nthere are currently no users for items to randomly associate to, please add some users first.")
         print("\nexiting...\n")
         sys.exit()
 
@@ -35,10 +50,11 @@ def InsertMockItems(count):
     for i in range(1, count):
         id = random.randint(1, 1000000)
         category_id = random.randint(0, categoryCount - 1)
+        user_id = random.randint(0, userCount - 1)
         item_name = "item_name_" + str(id)
         date = "2007-12-31"
         print(categoryIDs[category_id]['id'])
-        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "user_id": 69, "id": id})
+        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "user_id": userIDs[user_id]['id'], "id": id})
 
     conn.commit()
     conn.close()
@@ -54,6 +70,21 @@ def InsertMockCategories(count):
         category_name = "category_name_" + str(id)
         category_description = " category desc " + str(id)
         cursor.execute(MOCK_CATEGORY, {"name": category_name, "description": category_description, "id": id})
+
+    conn.commit()
+    conn.close()
+
+
+def InsertMockUsers(count):
+    conn, cursor = connect_to_db('item_catalog')
+
+
+    print("Inserting " + str(count) +  " mock users...")
+    for i in range(1, count):
+        id = random.randint(1, 1000000)
+        user_name = "user_name_" + str(id)
+        user_email = "user_email_" + str(id)
+        cursor.execute(MOCK_USER, {"name": user_name, "email": user_email, "id": id})
 
     conn.commit()
     conn.close()
@@ -85,6 +116,7 @@ if __name__ == '__main__':
         print("Second argument of program missing, available options are:")
         print("    category")
         print("    item")
+        print("    user")
         print("\nexiting...\n")
         sys.exit()
 
@@ -100,5 +132,7 @@ if __name__ == '__main__':
         InsertMockItems(amount_to_add)
     elif(type_to_add == "category"):
         InsertMockCategories(amount_to_add)
+    elif(type_to_add == "user"):
+        InsertMockUsers(amount_to_add)
 
     print("")

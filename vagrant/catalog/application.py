@@ -107,7 +107,9 @@ def view_single_item(category_name, item_name):
 
 @app.route("/manage.html")
 def manage_items():
-    return render_template('manage.html', active_link="manage", user_email=get_user_email(), items=get_items())
+    if 'credentials' not in flask.session:
+        return flask.redirect(flask.url_for('view_recent_items'))
+    return render_template('manage.html', active_link="manage", user_email=get_user_email(), items=get_owned_items())
 
 
 #####
@@ -249,6 +251,36 @@ def get_categories():
 
     conn.close()
     return results
+
+def get_owned_items():
+    conn, cursor = connect_to_db("item_catalog")
+    select_owned_items ="""
+        SELECT json_agg(json_build_object(
+            'item_name', item.name, 
+            'category_name', category.name,
+            'category_id', category_id, 
+            'description', item.description,
+            'date', CAST(date_created AS TEXT), 
+            'item_id', item.id
+        ))
+        FROM item
+        INNER JOIN category
+        ON item.category_id = category.id
+        INNER JOIN users
+        ON item.user_id = users.id
+        WHERE users.email = %(email)s;
+        """
+    cursor.execute(
+        select_owned_items,
+        {"email": get_user_email()}
+    )
+
+    fetchAll= cursor.fetchall()
+    results = fetchAll[0][0]
+
+    conn.close()
+    return results 
+
 
 
 #####
