@@ -48,6 +48,19 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 #####                   Html Routing
 #####
 #####
+@app.route('/logout')
+def logout():
+    print("logout")
+    if 'credentials' in flask.session:
+        del flask.session['credentials']
+        print("deleting user credentials")
+    if 'credentials' in flask.session:
+        print('it didnt work...')
+    else:
+        print('it worked')
+    return flask.redirect(flask.url_for('view_recent_items'))
+
+
 @app.route('/oauth2callback')
 def oauth2callback():
   flow = client.flow_from_clientsecrets(
@@ -68,6 +81,8 @@ def oauth2callback():
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
+    return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
+    """
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('oauth2callback'))
     credentials = client.OAuth2Credentials.from_json(flask.session['credentials'])
@@ -76,12 +91,8 @@ def view_recent_items():
         return flask.redirect(flask.url_for('oauth2callback'))
     else:
         http_auth = credentials.authorize(httplib2.Http())
-        """
-        drive = discovery.build('drive', 'v2', http_auth)
-        files = drive.files().list().execute()
-        return json.dumps(files)
-        """
         return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
+    """
 
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
