@@ -53,11 +53,6 @@ def logout():
     print("logout")
     if 'credentials' in flask.session:
         del flask.session['credentials']
-        print("deleting user credentials")
-    if 'credentials' in flask.session:
-        print('it didnt work...')
-    else:
-        print('it worked')
     return flask.redirect(flask.url_for('view_recent_items'))
 
 
@@ -67,7 +62,6 @@ def oauth2callback():
       'client_secrets.json',
       scope='https://www.googleapis.com/auth/userinfo.email',
       redirect_uri=flask.url_for('oauth2callback', _external=True))
-      #deleted 'include granted scopes'
   if 'code' not in flask.request.args:
     auth_uri = flow.step1_get_authorize_url()
     return flask.redirect(auth_uri)
@@ -82,17 +76,6 @@ def oauth2callback():
 @app.route("/index.html")
 def view_recent_items():
     return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
-    """
-    if 'credentials' not in flask.session:
-        return flask.redirect(flask.url_for('oauth2callback'))
-    credentials = client.OAuth2Credentials.from_json(flask.session['credentials'])
-
-    if credentials.access_token_expired:
-        return flask.redirect(flask.url_for('oauth2callback'))
-    else:
-        http_auth = credentials.authorize(httplib2.Http())
-        return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
-    """
 
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
@@ -282,12 +265,39 @@ def get_owned_items():
     return results 
 
 
+def create_item(name, category, description):
+    print("create item pls")
+    conn, cursor = connect_to_db("item_catalog")
+
+    #TODO: Check to make sure name, category and description are valid
+
+    #TODO: get date
+    #TODO: get user id that created item (from flask.session)
+
+    cursor.execute("""
+    INSERT INTO item
+    (name, category_id, description, date_created, id, user_id)
+    VALUES ()
+    """)
+
+    results = strip_containers(cursor.fetchall())
+
+    conn.close()
+    #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
+
 
 #####
 #####
 #####                   Rest API
 #####
 #####
+@app.route("/catalog/createitem", methods=["POST"])
+def rest_create_item():
+    print("rest create item")
+    #TODO: how do you get this info from the body?
+    create_item(name, category, description)
+
+
 @app.route("/catalog/item", methods=["GET"])
 def rest_get_items():
     return json.dumps(get_items())

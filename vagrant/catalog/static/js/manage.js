@@ -9,4 +9,7 @@ $(document).ready(function(){
         $("#edit-item-modal").modal("show")
     });
 
+    $("#confirm-add-item").click(function(){
+        alert("Confirm add item");
+    });
 });
