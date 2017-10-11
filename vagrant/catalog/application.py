@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import datetime
 
 import psycopg2
 import json
@@ -75,6 +76,7 @@ def oauth2callback():
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
+    create_item("item name", "item cat", "item desc")
     return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
 
 
@@ -269,18 +271,38 @@ def create_item(name, category, description):
     print("create item pls")
     conn, cursor = connect_to_db("item_catalog")
 
+    if 'credentials' not in flask.session:
+        print("user not logged in!")
+        #return... something
+
     #TODO: Check to make sure name, category and description are valid
 
-    #TODO: get date
-    #TODO: get user id that created item (from flask.session)
+    date_created = datetime.date.today()
+    print(date_created)
 
-    cursor.execute("""
-    INSERT INTO item
-    (name, category_id, description, date_created, id, user_id)
-    VALUES ()
-    """)
+    user_email = get_user_email()
+    user_id = None
 
-    results = strip_containers(cursor.fetchall())
+    if(user_email != None):
+        cursor.execute("""
+        SELECT json_agg(json_build_object(
+            'user_id', id
+        )) 
+        FROM users
+        WHERE users.email = %(email)s;
+        """, {"email": user_email})
+
+        user_id = strip_containers(cursor.fetchall())
+        print("creator is: " + str(user_id))
+
+
+    #cursor.execute("""
+    #INSERT INTO item
+    #(name, category_id, description, date_created, id, user_id)
+    #VALUES ( , , , date_created, <how create id>, user_id)
+    #""")
+
+    #results = strip_containers(cursor.fetchall())
 
     conn.close()
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
@@ -295,6 +317,9 @@ def create_item(name, category, description):
 def rest_create_item():
     print("rest create item")
     #TODO: how do you get this info from the body?
+    name = "name place holder"
+    category = "category placeholder"#TODO: this should be an int since it is an ID from a drop down
+    description = "description placeholder"
     create_item(name, category, description)
 
 
