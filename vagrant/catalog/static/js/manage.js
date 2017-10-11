@@ -10,6 +10,19 @@ $(document).ready(function(){
     });
 
     $("#confirm-add-item").click(function(){
-        alert("Confirm add item");
+        url="/catalog/createitem"
+
+        $.ajax({
+            contentType: 'application/json',
+            dataType: 'json',
+            type: 'POST',
+            url: url, 
+            success: function(data){
+
+            },
+            error: function(data){
+
+            },
+        });
     });
 });

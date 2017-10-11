@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime
+import random
 
 import psycopg2
 import json
@@ -76,7 +77,7 @@ def oauth2callback():
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
-    create_item("item name", "item cat", "item desc")
+    #create_item("item name", 5, "item desc") #Janky way to test
     return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
 
 
@@ -267,7 +268,7 @@ def get_owned_items():
     return results 
 
 
-def create_item(name, category, description):
+def create_item(name, category_id, description):
     print("create item pls")
     conn, cursor = connect_to_db("item_catalog")
 
@@ -277,6 +278,11 @@ def create_item(name, category, description):
         #return... something
 
     #TODO: Check to make sure name, category and description are valid
+    name = str(name)
+    description = str(description)
+    category_id = int(category_id)
+    #item_id = 111 #TODO: how to generate random item id? preferably sql would do this for me
+    item_id = random.randint(1, 1000000)
 
     date_created = datetime.date.today()
     print(date_created)
@@ -302,7 +308,7 @@ def create_item(name, category, description):
     INSERT INTO item
     (name, category_id, description, date_created, id, user_id)
     VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(item_id)s, %(user_id)s)
-    """, {"name": "tst name", "category_id": 1010, "description": "tst description", "date_created": date_created, "item_id": 1010, "user_id": user_id})
+    """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "item_id": item_id, "user_id": user_id})
 
     conn.commit()
     print("create item pls -- after commit")
@@ -323,9 +329,10 @@ def rest_create_item():
     print("rest create item")
     #TODO: how do you get this info from the body?
     name = "name place holder"
-    category = "category placeholder"#TODO: this should be an int since it is an ID from a drop down
+    category = 1111#TODO: this should be an int since it is an ID from a drop down
     description = "description placeholder"
     create_item(name, category, description)
+    return "", 201
 
 
 @app.route("/catalog/item", methods=["GET"])
