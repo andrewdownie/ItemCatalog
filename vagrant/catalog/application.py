@@ -273,6 +273,7 @@ def create_item(name, category, description):
 
     if 'credentials' not in flask.session:
         print("user not logged in!")
+        return
         #return... something
 
     #TODO: Check to make sure name, category and description are valid
@@ -283,24 +284,28 @@ def create_item(name, category, description):
     user_email = get_user_email()
     user_id = None
 
-    if(user_email != None):
-        cursor.execute("""
-        SELECT json_agg(json_build_object(
-            'user_id', id
-        )) 
-        FROM users
-        WHERE users.email = %(email)s;
-        """, {"email": user_email})
+    #TODO: how to generate user id?
 
-        user_id = strip_containers(cursor.fetchall())
-        print("creator is: " + str(user_id))
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'user_id', id
+    )) 
+    FROM users
+    WHERE users.email = %(email)s;
+    """, {"email": user_email})
+
+    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    print("creator is: " + str(user_id))
 
 
-    #cursor.execute("""
-    #INSERT INTO item
-    #(name, category_id, description, date_created, id, user_id)
-    #VALUES ( , , , date_created, <how create id>, user_id)
-    #""")
+    cursor.execute("""
+    INSERT INTO item
+    (name, category_id, description, date_created, id, user_id)
+    VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(item_id)s, %(user_id)s)
+    """, {"name": "tst name", "category_id": 1010, "description": "tst description", "date_created": date_created, "item_id": 1010, "user_id": user_id})
+
+    conn.commit()
+    print("create item pls -- after commit")
 
     #results = strip_containers(cursor.fetchall())
 
