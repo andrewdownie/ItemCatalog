@@ -9,8 +9,9 @@ ITEM_TABLE = """
         category_id integer,
         description text,
         date_created date,
-        id integer,
-        user_id integer
+        id SERIAL,
+        user_id integer,
+        PRIMARY KEY  (id)
     );
 """
 
@@ -19,7 +20,8 @@ CATEGORY_TABLE = """
     CREATE TABLE category(
         name text,
         description text,
-        id integer
+        id SERIAL,
+        PRIMARY KEY (id)
     );
 """
 
@@ -28,7 +30,8 @@ USER_TABLE = """
     CREATE TABLE users(
         name text,
         email text,
-        id integer
+        id SERIAL,
+        PRIMARY KEY (id)
     );
 """
 

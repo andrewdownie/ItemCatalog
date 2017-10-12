@@ -6,20 +6,20 @@ import sys
 
 
 MOCK_ITEM = """
-INSERT INTO item (name, category_id, description, date_created, user_id, id)
-VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s, %(id)s); 
+INSERT INTO item (name, category_id, description, date_created, user_id)
+VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s); 
 """
 
 
 MOCK_CATEGORY = """
-INSERT INTO category (name, description, id)
-VALUES (%(name)s, %(description)s, %(id)s);
+INSERT INTO category (name, description)
+VALUES (%(name)s, %(description)s);
 """
 
 
 MOCK_USER = """
-INSERT INTO users (name, email, id)
-VALUES (%(name)s, %(email)s, %(id)s);
+INSERT INTO users (name, email)
+VALUES (%(name)s, %(email)s);
 """
 
 
@@ -34,7 +34,7 @@ def InsertMockItems(count):
     print("Getting the current user id's")
     cursor.execute("SELECT json_agg(json_build_object('id', id)) FROM users")
     userIDs = cursor.fetchall()[0][0]
-    userCount = len(categoryIDs)
+    userCount = len(userIDs)
 
 
     if(categoryCount == 0):
@@ -48,13 +48,16 @@ def InsertMockItems(count):
 
     print("Inserting " + str(count) + " mock items...")
     for i in range(1, count):
-        id = random.randint(1, 1000000)
-        category_id = random.randint(0, categoryCount - 1)
-        user_id = random.randint(0, userCount - 1)
-        item_name = "item_name_" + str(id)
+        item_name = "item_name_" + str(random.randint(0, 10000))
         date = "2007-12-31"
-        print(categoryIDs[category_id]['id'])
-        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": categoryIDs[category_id]['id'], "description": "this is test item desc", "date_created": date, "user_id": userIDs[user_id]['id'], "id": id})
+
+        category_index = random.randint(0, categoryCount - 1)
+        CATEGORY_ID = categoryIDs[category_index]['id']
+
+        user_index = random.randint(0, userCount - 1)
+        USER_ID = userIDs[user_index]['id']
+
+        cursor.execute(MOCK_ITEM, {"name": item_name, "category_id": CATEGORY_ID, "description": "this is test item desc", "date_created": date, "user_id": USER_ID})
 
     conn.commit()
     conn.close()
@@ -66,10 +69,10 @@ def InsertMockCategories(count):
 
     print("Inserting " + str(count) +  " mock categories...")
     for i in range(1, count):
-        id = random.randint(1, 1000000)
-        category_name = "category_name_" + str(id)
-        category_description = " category desc " + str(id)
-        cursor.execute(MOCK_CATEGORY, {"name": category_name, "description": category_description, "id": id})
+        rand_name = random.randint(0, 10000)
+        category_name = "category_name_" + str(rand_name)
+        category_description = " category desc " + str(rand_name)
+        cursor.execute(MOCK_CATEGORY, {"name": category_name, "description": category_description})
 
     conn.commit()
     conn.close()
@@ -81,10 +84,10 @@ def InsertMockUsers(count):
 
     print("Inserting " + str(count) +  " mock users...")
     for i in range(1, count):
-        id = random.randint(1, 1000000)
-        user_name = "user_name_" + str(id)
-        user_email = "user_email_" + str(id)
-        cursor.execute(MOCK_USER, {"name": user_name, "email": user_email, "id": id})
+        rand_name = random.randint(0, 10000)
+        user_name = "user_name_" + str(rand_name)
+        user_email = "user_email_" + str(rand_name)
+        cursor.execute(MOCK_USER, {"name": user_name, "email": user_email})
 
     conn.commit()
     conn.close()
