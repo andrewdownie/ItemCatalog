@@ -7,6 +7,7 @@ import json
 
 import flask
 from flask import render_template
+from flask import request
 
 # From oauth tutorial
 """
@@ -270,6 +271,7 @@ def get_owned_items():
 
 def create_item(name, category_id, description):
     print("create item pls")
+    return
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
@@ -327,12 +329,21 @@ def create_item(name, category_id, description):
 @app.route("/catalog/createitem", methods=["POST"])
 def rest_create_item():
     print("rest create item")
+
+
+
     #TODO: how do you get this info from the body?
+    data = request.data
+    print("About to print data")
+    print(data)
+    
+
+
     name = "name place holder"
     category = 1111#TODO: this should be an int since it is an ID from a drop down
     description = "description placeholder"
     create_item(name, category, description)
-    return "", 201
+    return json.dumps("")
 
 
 @app.route("/catalog/item", methods=["GET"])
