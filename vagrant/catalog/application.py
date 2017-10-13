@@ -328,6 +328,67 @@ def create_item(name, category_id, description):
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
+
+#TODO: need to redo the internals of update_item (this is jsut copied create item)
+#TODO: need to get the id for update_item
+def update_item(id, name, category_id, description):
+    print("create item pls")
+    conn, cursor = connect_to_db("item_catalog")
+
+    if 'credentials' not in flask.session:
+        print("user not logged in!")
+        return #TODO: what should this function return on failure?
+
+    ###
+    ###  Check to make sure name, category and description are valid
+    ###
+    name = str(name)
+    if(valid_item_name(name) == False):
+        return #TODO: what should this function return on failure
+
+    description = str(description)
+    category_id = int(category_id)
+
+
+    date_created = datetime.date.today()
+    print(date_created)
+
+    user_email = get_user_email()
+
+
+    ###
+    ### Get the users id that is currently logged in from their email address
+    ###
+    user_id = None
+
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'user_id', id
+    )) 
+    FROM users
+    WHERE users.email = %(email)s;
+    """, {"email": user_email})
+
+    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    print("creator is: " + str(user_id))
+
+
+
+    cursor.execute("""
+    INSERT INTO item
+    (name, category_id, description, date_created, user_id)
+    VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s)
+    """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "user_id": user_id})
+
+    conn.commit()
+    print("create item pls -- after commit")
+
+    #results = strip_containers(cursor.fetchall())
+
+    conn.close()
+    #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
+
+
 #####
 #####
 #####                   Rest API
@@ -408,7 +469,7 @@ def valid_item_name(item_name):
     reg=re.compile('^[a-z0-9_-]+$')
     match = reg.match(item_name)
     if(match == None):
-        print("did not match")
+        print("item name " + item_name + " did not match")
         return False
         print("matched")
     return True 
