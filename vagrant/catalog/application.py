@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import datetime
 import random
 
@@ -271,28 +272,33 @@ def get_owned_items():
 
 def create_item(name, category_id, description):
     print("create item pls")
-    return
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
         print("user not logged in!")
-        return
-        #return... something
+        return #TODO: what should this function return on failure?
 
-    #TODO: Check to make sure name, category and description are valid
+    ###
+    ###  Check to make sure name, category and description are valid
+    ###
     name = str(name)
+    if(valid_item_name(name) == False):
+        return #TODO: what should this function return on failure
+
     description = str(description)
     category_id = int(category_id)
-    #item_id = 111 #TODO: how to generate random item id? preferably sql would do this for me
-    item_id = random.randint(1, 1000000)
+
 
     date_created = datetime.date.today()
     print(date_created)
 
     user_email = get_user_email()
-    user_id = None
 
-    #TODO: how to generate user id?
+
+    ###
+    ### Get the users id that is currently logged in from their email address
+    ###
+    user_id = None
 
     cursor.execute("""
     SELECT json_agg(json_build_object(
@@ -306,11 +312,12 @@ def create_item(name, category_id, description):
     print("creator is: " + str(user_id))
 
 
+
     cursor.execute("""
     INSERT INTO item
-    (name, category_id, description, date_created, id, user_id)
-    VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(item_id)s, %(user_id)s)
-    """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "item_id": item_id, "user_id": user_id})
+    (name, category_id, description, date_created, user_id)
+    VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s)
+    """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "user_id": user_id})
 
     conn.commit()
     print("create item pls -- after commit")
@@ -330,18 +337,15 @@ def create_item(name, category_id, description):
 def rest_create_item():
     print("rest create item")
 
-
-
-    #TODO: how do you get this info from the body?
     data = request.data
-    print("About to print data")
-    print(data)
+    loaded_data = json.loads(data)
     
 
 
-    name = "name place holder"
-    category = 1111#TODO: this should be an int since it is an ID from a drop down
-    description = "description placeholder"
+    name = str(loaded_data["name"])
+    category = int(loaded_data["category"])
+    description = str(loaded_data["description"])
+
     create_item(name, category, description)
     return json.dumps("")
 
@@ -398,6 +402,17 @@ def get_user_email():
     if 'credentials' in flask.session:
         return json.loads(flask.session['credentials'])['id_token']['email']
     return None
+
+
+def valid_item_name(item_name): 
+    reg=re.compile('^[a-z0-9_-]+$')
+    match = reg.match(item_name)
+    if(match == None):
+        print("did not match")
+        return False
+        print("matched")
+    return True 
+
 
 
 #####

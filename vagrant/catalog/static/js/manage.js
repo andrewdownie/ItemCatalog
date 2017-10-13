@@ -18,7 +18,9 @@ $(document).ready(function(){
         console.log("About to send ajax request");
 
         data = {};
-        data.testKey = "meow, this is test key data";
+        data.name = "meow this_is_test_name";
+        data.category = 5
+        data.description = "meow, this is test key data";
 
         $.ajax({
             contentType: 'application/json',
