@@ -54,3 +54,7 @@ body{
     padding:7px;
     border-radius: 4px;
 }
+
+.red-text{
+    color: red;
+}

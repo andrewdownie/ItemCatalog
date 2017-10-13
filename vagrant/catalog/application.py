@@ -370,6 +370,7 @@ def edit_item(id, name, category_id, description):
 
 
     #TODO: make sure the user owns the item ------------------------------------------------------------
+    #           select the items user_id, check against it
 
     cursor.execute("""
     UPDATE item

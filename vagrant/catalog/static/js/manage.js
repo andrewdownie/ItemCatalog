@@ -4,11 +4,26 @@ $(document).ready(function(){
         $("#add-item-modal").modal("show");
     });
 
+    $("#edit-item-name").change(function(){
+        //alert("meow")
+    });
+
+
+    $("#edit-item-name").keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        valid_item_name = ValidItemName( $("#edit-item-name").val() )
+        alert(valid_item_name)
+        if(valid_item_name != true){
+            $("#edit-error-message").text(valid_item_name);
+        }
+
+    });
 
 
     $("#my-items-col").on("click", ".edit-item", function(){
         $("#edit-item-modal").modal("show")
     });
+
 
 
     $("#my-items-col").on("click", ".edit-item", function(){
@@ -84,3 +99,17 @@ $(document).ready(function(){
 
 
 });
+
+
+function ValidItemName(item_name){
+    var validCharactersOnly = new RegExp('^([a-z0-9_-]+)$')
+    alert(item_name)
+
+
+    if(validCharactersOnly.test(item_name) === false){
+        return "Item names can only contain alphanumeric, dashes and underscores.";
+    }
+
+
+    return true;
+}
