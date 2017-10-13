@@ -97,7 +97,7 @@ def view_single_item(category_name, item_name):
 def manage_items():
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('view_recent_items'))
-    return render_template('manage.html', active_link="manage", user_email=get_user_email(), items=get_owned_items())
+    return render_template('manage.html', active_link="manage", categories=get_categories(), user_email=get_user_email(), items=get_owned_items())
 
 
 #####
@@ -404,6 +404,8 @@ def rest_create_item():
 
 
     name = str(loaded_data["name"])
+    if(loaded_data["category"] == None):
+        return
     category = int(loaded_data["category"])
     description = str(loaded_data["description"])
 

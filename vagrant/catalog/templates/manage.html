@@ -60,7 +60,13 @@
                         </div>
                         <label for="item-category" class="col-xs-4">Category:</label>
                         <div class="col-xs-8">
-                            <input type="text" class="form-control" name="item-category" id="add-item-category">
+                            <!--<input type="text" class="form-control" name="item-category" id="add-item-category">-->
+                            <select id="add-item-category">
+                                <!--  <option value="volvo">Volvo</option> -->
+                            {%for category in items%}
+                                <option id="{{ category['id'] }}" value="volvo">{{ category["category_name"] }}</option>
+                            {%endfor%}
+                            </select>
                         </div>
                         <div class="col-xs-12 text-left">
                             <label for="comment">Description:</label>
