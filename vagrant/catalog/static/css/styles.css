@@ -47,3 +47,10 @@ body{
     padding-top: 10px;
     padding-bottom: 10px;
 }
+
+#add-item-category,
+#edit-item-category{
+    width:100%;
+    padding:7px;
+    border-radius: 4px;
+}

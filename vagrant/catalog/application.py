@@ -329,10 +329,8 @@ def create_item(name, category_id, description):
 
 
 
-#TODO: need to redo the internals of update_item (this is jsut copied create item)
-#TODO: need to get the id for update_item
-def update_item(id, name, category_id, description):
-    print("create item pls")
+def edit_item(id, name, category_id, description):
+    print("edit item pls")
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
@@ -348,10 +346,8 @@ def update_item(id, name, category_id, description):
 
     description = str(description)
     category_id = int(category_id)
+    id = int(id)
 
-
-    date_created = datetime.date.today()
-    print(date_created)
 
     user_email = get_user_email()
 
@@ -373,15 +369,16 @@ def update_item(id, name, category_id, description):
     print("creator is: " + str(user_id))
 
 
+    #TODO: make sure the user owns the item ------------------------------------------------------------
 
     cursor.execute("""
-    INSERT INTO item
-    (name, category_id, description, date_created, user_id)
-    VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s)
-    """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "user_id": user_id})
+    UPDATE item
+    SET name = %(name)s, category_id = %(category_id)s, description = %(description)s
+    WHERE id=%(item_id)s
+    """, {"name": name, "category_id": category_id, "description": description, "item_id": id})
 
     conn.commit()
-    print("create item pls -- after commit")
+    print("update item pls -- after commit")
 
     #results = strip_containers(cursor.fetchall())
 
@@ -410,6 +407,26 @@ def rest_create_item():
     description = str(loaded_data["description"])
 
     create_item(name, category, description)
+    return json.dumps("")
+
+
+@app.route("/catalog/edititem", methods=["POST"])
+def rest_edit_item():
+    print("rest edit item")
+
+    data = request.data
+    loaded_data = json.loads(data)
+    
+
+
+    name = str(loaded_data["name"])
+    if(loaded_data["category"] == None):
+        return
+    category = int(loaded_data["category"])
+    description = str(loaded_data["description"])
+    item_id = str(loaded_data["item_id"])
+
+    edit_item(item_id, name, category, description)
     return json.dumps("")
 
 
