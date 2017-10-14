@@ -10,40 +10,17 @@ import flask
 from flask import render_template
 from flask import request
 
-# From oauth tutorial
-"""
-from flask import request
-from flask import redirect
-from flask import jsonify
-from flask import url_for
-from flask import flash
-#from flask import session as login_session
-from flask import make_response
-
-from sqlalchemy import create_engine, asc
-from sqlalchemy.orm import sessionmaker
-import random
-import string
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-#import httplib2
-import json
-import requests
-"""
 
 
 # From google's tutorials
 import httplib2
 
-from apiclient import discovery #pip install google-api-python-client
+from apiclient import discovery ## pip install google-api-python-client
 from oauth2client import client
 
 
 app = flask.Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
-#CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
-#APPLICATION_NAME = "FSND Item Catalog Client ID"
 
 
 
@@ -79,7 +56,6 @@ def oauth2callback():
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
-    #create_item("item name", 5, "item desc") #Janky way to test
     return render_template('index.html', active_link="index", user_email=get_user_email(), current_category="Recent Items", categories=get_categories(), items=get_recent_items())
 
 
@@ -265,6 +241,7 @@ def get_owned_items():
 
     fetchAll= cursor.fetchall()
     results = fetchAll[0][0]
+    #TODO: replace this with the helper function I made to do this for me -------------------------------------
 
     conn.close()
     return results 
@@ -330,25 +307,25 @@ def create_item(name, category_id, description):
 
 
 def edit_item(id, name, category_id, description):
-    print("edit item pls")
+    errorList = []
+
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
-        print("user not logged in!")
-        return #TODO: what should this function return on failure?
+        errorList.append("User not logged in.")
+        return errorList
 
     ###
     ###  Check to make sure name, category and description are valid
     ###
     name = str(name)
     if(valid_item_name(name) == False):
-        return #TODO: what should this function return on failure
+        errorList.append("Item name is not valid. Item names can only contain alpha numeric characters, dashes and spaces.")
+        return errorList
 
     description = str(description)
     category_id = int(category_id)
     id = int(id)
-
-
     user_email = get_user_email()
 
 
@@ -369,8 +346,11 @@ def edit_item(id, name, category_id, description):
     print("creator is: " + str(user_id))
 
 
+
     #TODO: make sure the user owns the item ------------------------------------------------------------
     #           select the items user_id, check against it
+
+
 
     cursor.execute("""
     UPDATE item
@@ -384,6 +364,8 @@ def edit_item(id, name, category_id, description):
     #results = strip_containers(cursor.fetchall())
 
     conn.close()
+
+    return errorList
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
@@ -394,41 +376,65 @@ def edit_item(id, name, category_id, description):
 #####
 @app.route("/catalog/createitem", methods=["POST"])
 def rest_create_item():
-    print("rest create item")
+    errorList = []
 
     data = request.data
     loaded_data = json.loads(data)
-    
 
+    if(loaded_data["name"] == None):
+        errorList.append("Missing json key: name")
 
-    name = str(loaded_data["name"])
     if(loaded_data["category"] == None):
-        return
-    category = int(loaded_data["category"])
-    description = str(loaded_data["description"])
+        errorList.append("Missing json key: category")
 
-    create_item(name, category, description)
-    return json.dumps("")
+    if(loaded_data["description"] == None):
+        errorList.append("Missing json key: description")
+
+    if(len(errorList) == 0):
+        name = str(loaded_data["name"])
+        category = int(loaded_data["category"])
+        description = str(loaded_data["description"])
+
+        errors = create_item(name, category, description)    #TODO: create item should return status
+
+        if(len(errors) == 0):
+            return json.dumps({"status": "success"})
+        return json.dumps({"status": "failure", "errors": errors})
+
+    return json.dumps({"errors": errorList})
 
 
 @app.route("/catalog/edititem", methods=["POST"])
 def rest_edit_item():
-    print("rest edit item")
+    errorsList = []
 
     data = request.data
     loaded_data = json.loads(data)
-    
 
+    if("name" not in loaded_data):
+        errorList.append("Missing json key: name")
 
-    name = str(loaded_data["name"])
-    if(loaded_data["category"] == None):
-        return
-    category = int(loaded_data["category"])
-    description = str(loaded_data["description"])
-    item_id = str(loaded_data["item_id"])
+    if("category" not in loaded_data):
+        errorList.append("Missing json key: category")
 
-    edit_item(item_id, name, category, description)
-    return json.dumps("")
+    if("description" not in loaded_data):
+        errorList.append("Missing json key: description")
+
+    if("item_id" not in loaded_data):
+        errorList.append("Missing json key: item_id")
+
+    if(len(errorList) == 0):
+        name = str(loaded_data["name"])
+        category = int(loaded_data["category"])
+        description = str(loaded_data["description"])
+        item_id = str(loaded_data["item_id"])
+        errors = edit_item(item_id, name, category, description) #TODO: edit item should return a status
+
+        if(len(errors) == 0):
+            return json.dumps({"status": "success"})
+        return json.dumps({"status": "failure", "errors": errors})
+
+    return json.dumps({"errors": errorsList})
 
 
 @app.route("/catalog/item", methods=["GET"])

@@ -41,7 +41,7 @@ $(document).ready(function(){
 
 
 /////
-/////                   Manage
+/////                   Validate Item Name
 /////
 function IsValidItemName(item_name){
     var validCharactersOnly = new RegExp('^([a-zA-Z0-9_-]*)$')
@@ -107,6 +107,7 @@ function AddItem(){
         data: JSON.stringify(data),
         success: function(data){
             console.log("ajax request success :: add item")
+            alert(data)
         },
         error: function(data){
             console.log("ajax request failure :: add item")
@@ -134,6 +135,7 @@ function EditItem(){
         data: JSON.stringify(data),
         success: function(data){
             console.log("ajax request success :: edit item")
+            alert(data)
         },
         error: function(data){
             console.log("ajax request failure :: edit item")
