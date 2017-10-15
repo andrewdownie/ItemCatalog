@@ -98,10 +98,6 @@ def get_items():
         """
     )
 
-    """
-    fetchAll= cursor.fetchall()
-    results = fetchAll[0][0]
-    """
     results = strip_containers(cursor.fetchall())
 
     conn.close()
@@ -241,10 +237,6 @@ def get_owned_items():
         {"email": get_user_email()}
     )
 
-    """
-    fetchAll= cursor.fetchall()
-    results = fetchAll[0][0]
-    """
     results = strip_containers(cursor.fetchall())
 
     conn.close()
@@ -307,10 +299,7 @@ def create_item(name, category_id, description):
     conn.commit()
     print("create item pls -- after commit")
 
-    #results = strip_containers(cursor.fetchall())
-
     conn.close()
-    #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
     if(len(errors) == 0):
@@ -361,9 +350,9 @@ def edit_item(id, name, category_id, description):
 
 
 
-    #
-    #       Make sure the user owns this item
-    #
+    ###
+    ### Make sure the user owns this item
+    ###
     cursor.execute("""
     SELECT json_agg(json_build_object(
         'owner_id', user_id
@@ -389,13 +378,10 @@ def edit_item(id, name, category_id, description):
     conn.commit()
     print("update item pls -- after commit")
 
-    #results = strip_containers(cursor.fetchall())
-
     conn.close()
 
     print('pre final return')
     return json.dumps({"status": "success", "messages": messages})
-    #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
 #####
@@ -428,15 +414,6 @@ def rest_create_item():
 
         return create_item(name, category, description)
 
-        """
-        if(messages != None and len(messages) == 0):
-            print('success')
-            return json.dumps({"status": "success"})
-            print('failure 1')
-        """
-        #return json.dumps({"status": "failure", "messages": messages})
-
-    #return json.dumps({"messages": messages})
     return json.dumps({"messages": ["fake message"]})
 
 
@@ -465,12 +442,6 @@ def rest_edit_item():
         description = str(loaded_data["description"])
         item_id = str(loaded_data["item_id"])
         return edit_item(item_id, name, category, description) #TODO: edit item should return a status
-
-        """
-        if(len(errors) == 0):
-            return json.dumps({"status": "success"})
-        return json.dumps({"status": "failure", "messages": errors})
-        """
 
     return json.dumps({"messages": errorList})
 
@@ -550,7 +521,6 @@ def showLogin():
     state = ''.join(
         random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
 
