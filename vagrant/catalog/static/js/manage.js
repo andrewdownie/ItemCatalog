@@ -114,6 +114,9 @@ function AddItem(){
 
             ShowAlert(data);
 
+            //$("#item-card-row").append(BuildItemCard(item_data.id)
+            //TODO: need to get id from ajax results
+
             //TODO: add the item here
         },
         error: function(data){
@@ -189,4 +192,19 @@ function ShowAlert(ajaxData){
         $("#failure-alert").show();
         $("#failure-alert-message").html(messages);
     }
+}
+
+function BuildItemCard(item_id, item_name, category_id, category_name, item_desc){
+    var item_card = `
+    <div class="item-card-container col-md-4">
+        <div itemid="` + item_id + `" id="item-` + item_id + `" class="item-card col-xs-12">
+            <h3 class="page-header item-name">` + item_name + `</h3>
+            <h4>Category: <span categoryid="` + category_id + `" class="item-cat">` + category_name + `</span> </h4>
+            <p class="item-desc">` + item_desc + `</p>
+            <button class="btn btn-primary edit-item">Edit</button>
+        </div>
+    </div>
+    `
+
+    return item_card
 }
