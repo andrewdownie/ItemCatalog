@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import re
 import datetime
 import random
@@ -99,8 +98,11 @@ def get_items():
         """
     )
 
+    """
     fetchAll= cursor.fetchall()
     results = fetchAll[0][0]
+    """
+    results = strip_containers(cursor.fetchall())
 
     conn.close()
     return results 
@@ -239,9 +241,11 @@ def get_owned_items():
         {"email": get_user_email()}
     )
 
+    """
     fetchAll= cursor.fetchall()
     results = fetchAll[0][0]
-    #TODO: replace this with the helper function I made to do this for me -------------------------------------
+    """
+    results = strip_containers(cursor.fetchall())
 
     conn.close()
     return results 
@@ -310,28 +314,28 @@ def create_item(name, category_id, description):
 
 
     if(len(errors) == 0):
-        return json.dumps({"status": "success", "messages": "Successfully created item"})
+        return json.dumps({"status": "success", "messages": ["Successfully created item"]})
 
-    return json.dumps({"status": "failure", "messages": "Unhandled error occurred"})
+    return json.dumps({"status": "failure", "messages": ["Unhandled error occurred"]})
 
 
 
 def edit_item(id, name, category_id, description):
-    errorList = []
+    messages = []
 
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
-        errorList.append("User not logged in.")
-        return errorList
+        messages.append("User not logged in.")
+        return json.dumps({"status": "failure", "messages": messages})
 
     ###
     ###  Check to make sure name, category and description are valid
     ###
     name = str(name)
     if(valid_item_name(name) == False):
-        errorList.append("Item names can only contain alpha numeric characters, dashes and spaces.")
-        return errorList
+        messages.append("Item names can only contain alpha numeric characters, dashes and spaces.")
+        return json.dumps({"status": "failure", "messages": messages})
 
     description = str(description)
     category_id = int(category_id)
@@ -357,8 +361,22 @@ def edit_item(id, name, category_id, description):
 
 
 
-    #TODO: make sure the user owns the item ------------------------------------------------------------
-    #           select the items user_id, check against it
+    #
+    #       Make sure the user owns this item
+    #
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'owner_id', user_id
+    ))
+    FROM item
+    WHERE id=%(item_id)s;
+    """, {"item_id": id})
+
+    owner_id = strip_containers(cursor.fetchall())[0]['owner_id']
+
+    if(owner_id != user_id):
+        print("User does not own this item!")
+        return json.dumps({"status": "failure", "messages": ["User does not own the item they are trying to edit!"]})
 
 
 
@@ -376,7 +394,7 @@ def edit_item(id, name, category_id, description):
     conn.close()
 
     print('pre final return')
-    return errorList
+    return json.dumps({"status": "success", "messages": messages})
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
@@ -387,45 +405,44 @@ def edit_item(id, name, category_id, description):
 #####
 @app.route("/catalog/createitem", methods=["POST"])
 def rest_create_item():
-    errorList = []
+    messages = []
 
     data = request.data
     loaded_data = json.loads(data)
 
     if(loaded_data["name"] == None):
-        errorList.append("Missing json key: name")
+        messages.append("Missing json key: name")
 
     if(loaded_data["category"] == None):
-        errorList.append("Missing json key: category")
+        messages.append("Missing json key: category")
 
     if(loaded_data["description"] == None):
-        errorList.append("Missing json key: description")
+        messages.append("Missing json key: description")
 
-    if(len(errorList) == 0):
+    if(len(messages) == 0):
         name = str(loaded_data["name"])
         category = int(loaded_data["category"])
         description = str(loaded_data["description"])
 
         print('pre create item call')
 
-        resulting_messages = create_item(name, category, description)
+        return create_item(name, category, description)
 
         """
-        if(errorList != None and len(errorList) == 0):
+        if(messages != None and len(messages) == 0):
             print('success')
             return json.dumps({"status": "success"})
             print('failure 1')
         """
-        return resulting_messages 
-        #return json.dumps({"status": "failure", "messages": errorList})
+        #return json.dumps({"status": "failure", "messages": messages})
 
-    #return json.dumps({"messages": errorList})
+    #return json.dumps({"messages": messages})
     return json.dumps({"messages": ["fake message"]})
 
 
 @app.route("/catalog/edititem", methods=["POST"])
 def rest_edit_item():
-    errorsList = []
+    errorList = []
 
     data = request.data
     loaded_data = json.loads(data)
@@ -447,13 +464,15 @@ def rest_edit_item():
         category = int(loaded_data["category"])
         description = str(loaded_data["description"])
         item_id = str(loaded_data["item_id"])
-        errors = edit_item(item_id, name, category, description) #TODO: edit item should return a status
+        return edit_item(item_id, name, category, description) #TODO: edit item should return a status
 
+        """
         if(len(errors) == 0):
             return json.dumps({"status": "success"})
         return json.dumps({"status": "failure", "messages": errors})
+        """
 
-    return json.dumps({"messages": errorsList})
+    return json.dumps({"messages": errorList})
 
 
 @app.route("/catalog/item", methods=["GET"])

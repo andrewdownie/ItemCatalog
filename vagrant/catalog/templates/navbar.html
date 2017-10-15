@@ -25,9 +25,9 @@
                     </li>
                     {%if(user_email)%}
                     <li
-                    {%if(active_link == "manage")%}
+                        {%if(active_link == "manage")%}
                         class="active"
-                    {%endif%}>
+                        {%endif%}>
                         <a href="/manage.html">
                             Manage Items
                         </a>
@@ -42,7 +42,7 @@
                                 {{ user_email }}
                                 <b class="caret"></b>
                             </a>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <ul id="user-menu" class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                 <li><a href="/logout">Logout</a></li>
                             </ul>
                         </li>

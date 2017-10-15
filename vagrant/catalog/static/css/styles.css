@@ -58,3 +58,7 @@ body{
 .red-text{
     color: red;
 }
+
+#user-menu{
+    width: 100%;
+}
