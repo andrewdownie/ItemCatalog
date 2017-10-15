@@ -42,7 +42,7 @@
                         {% for item in items%}
 
                             <div class="item-card-container col-md-4">
-                                <div itemid="{{ item['item_id'] }}" class="item-card col-xs-12">
+                                <div itemid="{{ item['item_id'] }}" id="item-{{ item['item_id'] }}" class="item-card col-xs-12">
                                     <h3 class="page-header item-name">{{ item['item_name'] }}</h3>
                                     <h4>Category: <span categoryid="{{ item['category_id'] }}" class="item-cat">{{ item['category_name'] }}</span> </h4>
                                     <p class="item-desc">{{ item['description'] }}</p>

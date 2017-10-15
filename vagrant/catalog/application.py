@@ -441,7 +441,7 @@ def rest_edit_item():
         category = int(loaded_data["category"])
         description = str(loaded_data["description"])
         item_id = str(loaded_data["item_id"])
-        return edit_item(item_id, name, category, description) #TODO: edit item should return a status
+        return edit_item(item_id, name, category, description) 
 
     return json.dumps({"messages": errorList})
 

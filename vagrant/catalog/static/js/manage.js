@@ -6,14 +6,14 @@ $(document).ready(function(){
 
     $("#add-item").click(function(){
         $("#add-item-modal").modal("show");
-        ValidateItemName("#add-item-name", "#add-error-message");
+        ValidateItemName("#add-item-name", "#confirm-add-item", "#add-error-message");
     });
 
 
     $("#my-items-col").on("click", ".edit-item", function(){
         $("#edit-item-modal").modal("show")
         LoadItemValuesIntoEditModal($(this).parent());
-        ValidateItemName("#edit-item-name", "#edit-error-message");
+        ValidateItemName("#edit-item-name", "#confirm-edit-item", "#edit-error-message");
     });
 
 
@@ -30,12 +30,12 @@ $(document).ready(function(){
 
 
     $("#edit-item-name").on('keyup', function(event){
-        ValidateItemName("#edit-item-name", "#edit-error-message")
+        ValidateItemName("#edit-item-name", "#confirm-edit-item", "#edit-error-message")
     });
 
 
     $("#add-item-name").on('keyup', function(event){
-        ValidateItemName("#add-item-name", "#add-error-message")
+        ValidateItemName("#add-item-name", "#confirm-add-item", "#add-error-message")
     });
 
 
@@ -60,16 +60,18 @@ function IsValidItemName(item_name){
 }
 
 
-function ValidateItemName(inputBoxSelector, errorMessageSelector){
+function ValidateItemName(inputBoxSelector, buttonSelector, errorMessageSelector){
     current_item_name = $(inputBoxSelector).val()
 
     valid_item_name = IsValidItemName(current_item_name)
 
     if(valid_item_name != true){
         $(errorMessageSelector).text(valid_item_name); 
+        $(buttonSelector).prop("disabled", true)
     }
     else{
         $(errorMessageSelector).text("")
+        $(buttonSelector).prop("disabled", false)
     }
 }
 
@@ -111,6 +113,8 @@ function AddItem(){
             console.log(data)
 
             ShowAlert(data);
+
+            //TODO: add the item here
         },
         error: function(data){
             console.log("ajax request failure :: add item")
@@ -125,22 +129,31 @@ function EditItem(){
     
     console.log("About to send ajax request to edit item");
 
-    data = {};
-    data.item_id = Number($("#edit-item-name").attr("itemid"))
-    data.name = $("#edit-item-name").val();
-    data.category = Number($("#edit-item-category").val());
-    data.description = $("#edit-item-description").val();
+    item_data = {};
+    item_data.item_id = Number($("#edit-item-name").attr("itemid"))
+    item_data.name = $("#edit-item-name").val();
+    item_data.description = $("#edit-item-description").val();
+
+    item_data.category = Number($("#edit-item-category").val());
+    item_data.category_name = $("#edit-item-category option:selected").text()
 
     $.ajax({
         contentType: 'application/json',
         dataType: 'json',
         type: 'POST',
         url: url, 
-        data: JSON.stringify(data),
+        data: JSON.stringify(item_data),
         success: function(data){
             console.log("ajax request success :: edit item")
             console.log(data)
             ShowAlert(data);
+
+            var item_card = $("#item-" + item_data.item_id)
+            item_card.find(".item-name").text(item_data.name)
+            item_card.find(".item-desc").text(item_data.description)
+
+            item_card.find(".item-cat").text(item_data.category_name)
+            item_card.find(".item-cat").attr("categoryid", item_data.category)
         },
         error: function(data){
             console.log("ajax request failure :: edit item")
