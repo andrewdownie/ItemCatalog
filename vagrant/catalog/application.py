@@ -248,19 +248,22 @@ def get_owned_items():
 
 
 def create_item(name, category_id, description):
+    errors = []
+
     print("create item pls")
     conn, cursor = connect_to_db("item_catalog")
 
     if 'credentials' not in flask.session:
         print("user not logged in!")
-        return #TODO: what should this function return on failure?
+        return errors.append("User is not logged in.")
 
     ###
     ###  Check to make sure name, category and description are valid
     ###
     name = str(name)
     if(valid_item_name(name) == False):
-        return #TODO: what should this function return on failure
+        errors.append("Item names can only contain alphanumeric characters, dashes and underscores.")
+        return errors
 
     description = str(description)
     category_id = int(category_id)
@@ -305,6 +308,12 @@ def create_item(name, category_id, description):
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
 
+    if(len(errors) == 0):
+        return json.dumps({"status": "success", "messages": "Successfully created item"})
+
+    return json.dumps({"status": "failure", "messages": "Unhandled error occurred"})
+
+
 
 def edit_item(id, name, category_id, description):
     errorList = []
@@ -320,7 +329,7 @@ def edit_item(id, name, category_id, description):
     ###
     name = str(name)
     if(valid_item_name(name) == False):
-        errorList.append("Item name is not valid. Item names can only contain alpha numeric characters, dashes and spaces.")
+        errorList.append("Item names can only contain alpha numeric characters, dashes and spaces.")
         return errorList
 
     description = str(description)
@@ -395,13 +404,20 @@ def rest_create_item():
         category = int(loaded_data["category"])
         description = str(loaded_data["description"])
 
-        errors = create_item(name, category, description)    #TODO: create item should return status
+        create_item_result = create_item(name, category, description)
 
-        if(len(errors) == 0):
+        """
+        if(errorList != None and len(errorList) == 0):
+            print('success')
             return json.dumps({"status": "success"})
-        return json.dumps({"status": "failure", "errors": errors})
+            print('failure 1')
+        """
+        return create_item_result
+        #return json.dumps({"status": "failure", "messages": errorList})
 
-    return json.dumps({"errors": errorList})
+    print('failure 2')
+    #return json.dumps({"messages": errorList})
+    return json.dumps({"messages": ["fake message"]})
 
 
 @app.route("/catalog/edititem", methods=["POST"])
@@ -432,9 +448,9 @@ def rest_edit_item():
 
         if(len(errors) == 0):
             return json.dumps({"status": "success"})
-        return json.dumps({"status": "failure", "errors": errors})
+        return json.dumps({"status": "failure", "messages": errors})
 
-    return json.dumps({"errors": errorsList})
+    return json.dumps({"messages": errorsList})
 
 
 @app.route("/catalog/item", methods=["GET"])
@@ -492,12 +508,12 @@ def get_user_email():
 
 
 def valid_item_name(item_name): 
-    reg=re.compile('^[a-z0-9_-]+$')
+    reg=re.compile('^[a-zA-Z0-9_-]+$')
     match = reg.match(item_name)
     if(match == None):
-        print("item name " + item_name + " did not match")
+        print("item name " + item_name + " is not valid")
         return False
-        print("matched")
+    print("valid item name")
     return True 
 
 

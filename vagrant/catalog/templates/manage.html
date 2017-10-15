@@ -13,6 +13,8 @@
 
     <body>
         <div class="container">
+
+
             <div class="row">
                 <div id="my-items-col" class="col-md-12">
                     <h2 class="page-header">Manage my items</h2>
@@ -21,6 +23,20 @@
                             <button id="add-item" class="btn btn-success">Add Item</button>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <br>
+                            <div style="display:none;" id="failure-alert" class="alert alert-danger">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>Failure: </strong><span id="failure-alert-message"></span>
+                            </div>
+                            <div style="display:none;" id="success-alert" class="alert alert-success">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>Success: </strong><span id="success-alert-message"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
 
                         {% for item in items%}

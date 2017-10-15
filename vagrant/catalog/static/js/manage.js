@@ -18,11 +18,13 @@ $(document).ready(function(){
 
 
     $("#confirm-add-item").click(function(){
+        HideAlerts();
         AddItem();
     });
 
 
     $("#confirm-edit-item").click(function(){
+        HideAlerts();
         EditItem();
     });
 
@@ -97,7 +99,6 @@ function AddItem(){
     data.name = $("#add-item-name").val()
     data.category = Number($("#add-item-category").val())
     data.description = $("#add-item-description").val()
-    alert(data.category)
 
     $.ajax({
         contentType: 'application/json',
@@ -107,10 +108,13 @@ function AddItem(){
         data: JSON.stringify(data),
         success: function(data){
             console.log("ajax request success :: add item")
-            alert(data)
+            console.log(data)
+
+            ShowAlert(data);
         },
         error: function(data){
             console.log("ajax request failure :: add item")
+            console.log(data)
         },
     });
 }
@@ -135,11 +139,41 @@ function EditItem(){
         data: JSON.stringify(data),
         success: function(data){
             console.log("ajax request success :: edit item")
-            alert(data)
+            console.log(data)
+            ShowAlert(data);
         },
         error: function(data){
             console.log("ajax request failure :: edit item")
+            console.log(data)
         },
     });
 }
 
+
+/////
+/////                   Alerts
+/////
+function HideAlerts(){
+    $("#success-alert").hide();
+    $("#failure-alert").hide();
+}
+
+function ShowAlert(ajaxData){
+
+    var messages = "<ul>";
+    for(var i = 0; i < ajaxData.messages.length; i++){
+        messages += "<li>" 
+        messages += ajaxData.messages[i]
+        messages += "</li>" 
+    }
+    messages += "</ul>";
+
+    if(ajaxData.status == "success"){
+        $("#success-alert").show();
+        $("#success-alert-message").html(messages)
+    }
+    else{
+        $("#failure-alert").show();
+        $("#failure-alert-message").html(messages);
+    }
+}
