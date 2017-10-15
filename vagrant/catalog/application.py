@@ -255,7 +255,8 @@ def create_item(name, category_id, description):
 
     if 'credentials' not in flask.session:
         print("user not logged in!")
-        return errors.append("User is not logged in.")
+        errors.append("User is not logged in.")
+        return json.dumps({"status": "failure", "messages": errors})
 
     ###
     ###  Check to make sure name, category and description are valid
@@ -263,7 +264,7 @@ def create_item(name, category_id, description):
     name = str(name)
     if(valid_item_name(name) == False):
         errors.append("Item names can only contain alphanumeric characters, dashes and underscores.")
-        return errors
+        return json.dumps({"status": "failure", "messages": errors})
 
     description = str(description)
     category_id = int(category_id)
@@ -374,6 +375,7 @@ def edit_item(id, name, category_id, description):
 
     conn.close()
 
+    print('pre final return')
     return errorList
     #return results #needs to return a 201 and 500, or whatever the appropriate html codes are
 
@@ -404,7 +406,9 @@ def rest_create_item():
         category = int(loaded_data["category"])
         description = str(loaded_data["description"])
 
-        create_item_result = create_item(name, category, description)
+        print('pre create item call')
+
+        resulting_messages = create_item(name, category, description)
 
         """
         if(errorList != None and len(errorList) == 0):
@@ -412,10 +416,9 @@ def rest_create_item():
             return json.dumps({"status": "success"})
             print('failure 1')
         """
-        return create_item_result
+        return resulting_messages 
         #return json.dumps({"status": "failure", "messages": errorList})
 
-    print('failure 2')
     #return json.dumps({"messages": errorList})
     return json.dumps({"messages": ["fake message"]})
 
