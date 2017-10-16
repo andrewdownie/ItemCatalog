@@ -97,27 +97,25 @@ function AddItem(){
     
     console.log("About to send ajax request");
 
-    data = {};
-    data.name = $("#add-item-name").val()
-    data.category = Number($("#add-item-category").val())
-    data.description = $("#add-item-description").val()
+    item_data = {};
+    item_data.name = $("#add-item-name").val()
+    item_data.category = Number($("#add-item-category").val())
+    item_data.description = $("#add-item-description").val()
+    item_data.category_name = $("#add-item-category option:selected").text()
 
     $.ajax({
         contentType: 'application/json',
         dataType: 'json',
         type: 'POST',
         url: url, 
-        data: JSON.stringify(data),
+        data: JSON.stringify(item_data),
         success: function(data){
             console.log("ajax request success :: add item")
             console.log(data)
 
             ShowAlert(data);
 
-            //$("#item-card-row").append(BuildItemCard(item_data.id)
-            //TODO: need to get id from ajax results
-
-            //TODO: add the item here
+            $("#item-card-row").prepend(BuildItemCard(data['item_id'], item_data.name, item_data.category, item_data.category_name, item_data.description))
         },
         error: function(data){
             console.log("ajax request failure :: add item")

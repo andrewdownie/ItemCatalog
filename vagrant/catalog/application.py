@@ -295,22 +295,18 @@ def create_item(name, category_id, description):
     (name, category_id, description, date_created, user_id)
     VALUES (%(name)s, %(category_id)s, %(description)s, %(date_created)s, %(user_id)s)
     """, {"name": name, "category_id": category_id, "description": description, "date_created": date_created, "user_id": user_id})
-
-
     conn.commit()
 
     cursor.execute("SELECT LASTVAL();")
-    lastid = cursor.fetchone()[0]
-    print("Last id was: " + str(lastid))
-    print("create item pls -- after commit")
+    lastid = str(cursor.fetchone()[0])
 
     conn.close()
 
 
     if(len(errors) == 0):
-        return json.dumps({"status": "success", "messages": ["Successfully created item"]})
+        return json.dumps({"status": "success", "messages": ["Successfully created item"], "item_id": lastid})
 
-    return json.dumps({"status": "failure", "messages": ["Unhandled error occurred"]})
+    return json.dumps({"status": "failure", "messages": ["Unhandled error occurred!"]})
 
 
 
