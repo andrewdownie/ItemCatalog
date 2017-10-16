@@ -1,5 +1,10 @@
 $(document).ready(function(){
 
+    item_count = $("#items-container").children().length
+    if(item_count === 0){
+        $("#items-container").prepend("<p>There are no items :(</p><br><br>")
+    }
+
 
     $("#all-categories-col").on("click", ".category-link", function(){
         var cat_id = this.id;

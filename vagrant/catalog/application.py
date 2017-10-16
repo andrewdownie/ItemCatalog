@@ -238,6 +238,8 @@ def get_owned_items():
     )
 
     results = strip_containers(cursor.fetchall())
+    if(results != None):
+        results.reverse()
 
     conn.close()
     return results 
@@ -288,6 +290,16 @@ def create_item(name, category_id, description):
     user_id = strip_containers(cursor.fetchall())[0]['user_id']
     print("creator is: " + str(user_id))
 
+
+    ###
+    ### Check if the item name already exists 
+    ###
+    cursor.execute("""
+    SELECT id FROM item WHERE name=%(item_name)s;
+    """, {"item_name": name})
+    
+    #TODO: check if a result was returned------------------------------------"
+    # if a result was returned, abort with failure
 
 
     cursor.execute("""

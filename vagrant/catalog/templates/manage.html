@@ -39,7 +39,8 @@
 
                     <div class="row" id="item-card-row">
 
-                        {% for item in items%}
+                    {%if items != None%}
+                        {%for item in items%}
 
                             <div class="item-card-container col-md-4">
                                 <div itemid="{{ item['item_id'] }}" id="item-{{ item['item_id'] }}" class="item-card col-xs-12">
@@ -51,6 +52,8 @@
                             </div>
 
                         {% endfor %}
+                    {%endif%}
+                    
 
                     </div>
                 </div>

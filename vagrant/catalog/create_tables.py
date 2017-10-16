@@ -5,7 +5,7 @@ import psycopg2
 
 ITEM_TABLE = """
     CREATE TABLE item(
-        name text,
+        name text NOT NULL UNIQUE,
         category_id integer,
         description text,
         date_created date,

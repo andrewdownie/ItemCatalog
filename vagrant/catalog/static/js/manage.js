@@ -1,7 +1,14 @@
+card_count = 0
 /////
 /////                   Events
 /////
 $(document).ready(function(){
+
+    card_count = $("#item-card-row").children().length
+
+    if(card_count === 0){
+        $("#item-card-row").prepend("<p>You don't have any items, maybe you should add some?</p>")
+    }
 
 
     $("#add-item").click(function(){
@@ -115,6 +122,9 @@ function AddItem(){
 
             ShowAlert(data);
 
+            if(card_count === 0){
+                $("#item-card-row").empty()
+            }
             $("#item-card-row").prepend(BuildItemCard(data['item_id'], item_data.name, item_data.category, item_data.category_name, item_data.description))
         },
         error: function(data){

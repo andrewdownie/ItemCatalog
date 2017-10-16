@@ -40,14 +40,16 @@
                 <div id="items-col" class="col-md-8">
                     <h2 class="page-header" id="items-header">{{ current_category }}</h2>
                     <div id="items-container">
-                    {% for item in items%}
+                    {%if items != None%}
+                        {%for item in items%}
                         <div>
                             <a href="#" id="{{ item['item_id'] }}" class="item-link"><h4>{{ item['item_name'] }}</h4></a>
                             Category: <span class="item-category">{{ item['category_name'] }}</span>
                             <br/>
                             <br/>
                         </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% endif %}
                     </div>
                 </div>
 
