@@ -470,9 +470,12 @@ def get_items_by_category():
 
     #TODO: pack into with "Category" as first key, and everything in a list off of that
     print("Get items sorted by category")
-    result = strip_containers(cursor.fetchall())
+    result_json = strip_containers(cursor.fetchall())
+    result = json.dumps(result_json)
+    result_container = {"Category": result_json}
+
     conn.close()
-    return result
+    return (result_container)
 
 #####
 #####
