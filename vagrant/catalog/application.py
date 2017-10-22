@@ -293,17 +293,7 @@ def create_item(name, category_id, description):
     ### Get the users id that is currently logged in from their email address
     ###
     user_email = get_user_email()
-    user_id = None
-
-    cursor.execute("""
-    SELECT json_agg(json_build_object(
-        'user_id', id
-    )) 
-    FROM users
-    WHERE users.email = %(email)s;
-    """, {"email": user_email})
-
-    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    user_id = get_user_id(cursor)
     print("creator is: " + str(user_id))
 
 
@@ -364,17 +354,8 @@ def edit_item(id, name, category_id, description):
     ###
     ### Get the users id that is currently logged in from their email address
     ###
-    user_id = None
 
-    cursor.execute("""
-    SELECT json_agg(json_build_object(
-        'user_id', id
-    )) 
-    FROM users
-    WHERE users.email = %(email)s;
-    """, {"email": user_email})
-
-    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    user_id = get_user_id(cursor)
     print("creator is: " + str(user_id))
 
 
@@ -413,6 +394,8 @@ def edit_item(id, name, category_id, description):
     return json.dumps({"status": "success", "messages": messages})
 
 
+
+
 def delete_item(id):
     messages = []
 
@@ -427,18 +410,7 @@ def delete_item(id):
     ###
     ### Get the users id that is currently logged in from their email address
     ###
-    user_id = None
-    user_email = get_user_email()
-
-    cursor.execute("""
-    SELECT json_agg(json_build_object(
-        'user_id', id
-    )) 
-    FROM users
-    WHERE users.email = %(email)s;
-    """, {"email": user_email})
-
-    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    user_id = get_user_id(cursor)
     print("creator is: " + str(user_id))
 
 
@@ -583,6 +555,25 @@ def rest_get_categories():
 #####                   Helper Functions
 #####
 #####
+def get_user_id(cursor):
+    ###
+    ### Get the users id that is currently logged in from their email address
+    ###
+    user_id = None
+    user_email = get_user_email()
+
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'user_id', id
+    )) 
+    FROM users
+    WHERE users.email = %(email)s;
+    """, {"email": user_email})
+
+    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    return user_id
+
+
 def connect_to_db(db_name):
     try:
         conn = psycopg2.connect('dbname=' + str(db_name))

@@ -198,7 +198,7 @@ function DeleteItem(){
             console.log("ajax request success :: delete item")
             console.log(data)
 
-            $("#item-" + item_data.item_id).remove()
+            $("#item-" + item_data.item_id).parent().remove()
 
         },
         error: function(data){
