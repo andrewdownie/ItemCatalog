@@ -20,12 +20,14 @@ app = flask.Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 """
-    Html Routing
+    Html Routing ----------------------------------------------------
 """
 
 
 @app.route('/logout')
 def logout():
+    # When a user navigates to /logout, delete their credentials
+    # in their session variable, and redirect them to index
     print("logout")
     if 'credentials' in flask.session:
         del flask.session['credentials']
@@ -34,13 +36,19 @@ def logout():
 
 @app.route('/oauth2callback')
 def oauth2callback():
+    # Handle logging the user in with Google
+
+    # Setup a client flow in order to login
     flow = client.flow_from_clientsecrets(
         'client_secrets.json',
         scope='https://www.googleapis.com/auth/userinfo.email',
         redirect_uri=flask.url_for('oauth2callback', _external=True))
+
+    # If they haven't logged in yet, do so now first,
     if 'code' not in flask.request.args:
         auth_uri = flow.step1_get_authorize_url()
         return flask.redirect(auth_uri)
+    # Otherwise exchange auth code for a token, and then go to index
     else:
         auth_code = flask.request.args.get('code')
         credentials = flow.step2_exchange(auth_code)
@@ -51,6 +59,7 @@ def oauth2callback():
 @app.route("/")
 @app.route("/index.html")
 def view_recent_items():
+    # Render the index page, grabbing categories and recent items to do so
     return render_template('index.html',
                            active_link="index",
                            user_email=get_user_email(),
@@ -61,6 +70,7 @@ def view_recent_items():
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
 def view_category_items(category_name):
+    # Render all items of a specific category
     return render_template('index.html',
                            active_link="index",
                            user_email=get_user_email(),
@@ -71,6 +81,7 @@ def view_category_items(category_name):
 
 @app.route("/catalog/<category_name>/<item_name>", methods=["GET"])
 def view_single_item(category_name, item_name):
+    # Render a specific item
     return render_template('item.html',
                            active_link="index",
                            user_email=get_user_email(),
@@ -80,6 +91,7 @@ def view_single_item(category_name, item_name):
 
 @app.route("/manage.html")
 def manage_items():
+    # Render a users items to allow them to manage the items they own
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('view_recent_items'))
     return render_template('manage.html',
@@ -89,11 +101,12 @@ def manage_items():
                            items=get_owned_items())
 
 """
-    Database functions
+    Database functions ----------------------------------------------
 """
 
 
 def get_items():
+    # Get all items from the database along with category names in json
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
         """
@@ -118,6 +131,7 @@ def get_items():
 
 
 def get_category_items(category_name):
+    # Get all items of a specific type from the database in json
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
         """
@@ -142,6 +156,7 @@ def get_category_items(category_name):
 
 
 def get_single_item(category_name, item_name):
+    # Get all info about a single item
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
         """
@@ -158,7 +173,7 @@ def get_single_item(category_name, item_name):
                 SELECT
                     item.id AS item_id,
                     item.name AS item_name,
-                    item.description AS item_descriptio,
+                    item.description AS item_description,
                     item.date_created AS item_date_created,
                     category.id AS category_id,
                     category.name AS category_name
@@ -181,6 +196,7 @@ def get_single_item(category_name, item_name):
 
 
 def get_recent_items():
+    # Get the 10 most recently created items
     conn, cursor = connect_to_db("item_catalog")
     cursor.execute(
         """
@@ -212,6 +228,7 @@ def get_recent_items():
 
 
 def get_categories():
+    # Get all categories
     conn, cursor = connect_to_db("item_catalog")
 
     cursor.execute("""
@@ -229,6 +246,7 @@ def get_categories():
 
 
 def get_owned_items():
+    # Get all items owned by a specific user
     conn, cursor = connect_to_db("item_catalog")
     select_owned_items = """
         SELECT json_agg(json_build_object(
@@ -260,6 +278,7 @@ def get_owned_items():
 
 
 def create_item(name, category_id, description):
+    # Create a new item for a specific user
     errors = []
 
     print("create item pls")
@@ -345,6 +364,7 @@ def create_item(name, category_id, description):
 
 
 def edit_item(id, name, category_id, description):
+    # Edit a specific users item
     messages = []
 
     conn, cursor = connect_to_db("item_catalog")
@@ -388,20 +408,21 @@ def edit_item(id, name, category_id, description):
              "messages":
              ["User does not own the item they are trying to edit!"]})
 
-    cursor.execute("""
-    UPDATE item
-    SET name = %(name)s,
-        category_id = %(category_id)s,
-        description = %(description)s
-    WHERE id=%(item_id)s
-    """,
-                   {
-                    "name": name,
-                    "category_id": category_id,
-                    "description": description,
-                    "item_id": id
-                   }
-                   ) # PEP8 you suck
+    cursor.execute(
+        """
+        UPDATE item
+        SET name = %(name)s,
+            category_id = %(category_id)s,
+            description = %(description)s
+        WHERE id=%(item_id)s
+        """,
+        {
+            "name": name,
+            "category_id": category_id,
+            "description": description,
+            "item_id": id
+        }
+    )
 
     conn.commit()
     print("update item pls -- after commit")
@@ -413,6 +434,7 @@ def edit_item(id, name, category_id, description):
 
 
 def delete_item(id):
+    # Delete an item for a specific user in json
     messages = []
 
     conn, cursor = connect_to_db("item_catalog")
@@ -461,6 +483,7 @@ def delete_item(id):
 
 
 def get_items_by_category():
+    # Get all items sorted by which category they belong to in json
     conn, cursor = connect_to_db("item_catalog")
 
     cursor.execute("""
@@ -490,12 +513,14 @@ def get_items_by_category():
     return (result_container)
 
 """
-    Rest API
+    Rest API --------------------------------------------------------
 """
 
 
 @app.route("/catalog/createitem", methods=["POST"])
 def rest_create_item():
+    # Rest function to create an item for a user
+    # Does validation of sent data, and then calls create_item function
     messages = []
 
     data = request.data
@@ -524,6 +549,8 @@ def rest_create_item():
 
 @app.route("/catalog/edititem", methods=["POST"])
 def rest_edit_item():
+    # Rest function to edit an item for a user
+    # Does validation of sent data, and then calls edit_item function
     errorList = []
 
     data = request.data
@@ -553,6 +580,8 @@ def rest_edit_item():
 
 @app.route("/catalog/deleteitem", methods=["POST"])
 def rest_delete_item():
+    # Rest function to delete an item for a user
+    # Does validation of sent data, and then calls delete_item function
     errorList = []
 
     data = request.data
@@ -570,35 +599,46 @@ def rest_delete_item():
 
 @app.route("/catalog/item", methods=["GET"])
 def rest_get_items():
+    # Gets all items, and returns it as json string
     return json.dumps(get_items())
 
 
 @app.route("/catalog/<category_name>/items", methods=["GET"])
 def rest_get_category_items(category_name):
+    # Gets all items of a specific category
+    # and returns it as a json string
     return json.dumps(get_category_items())
 
 
 @app.route("/catalog/<category_name>/<item_name>", methods=["GET"])
 def rest_get_single_item(category_name, item_name):
+    # Gets all info about a single item
+    # and returns it as a json string
     return json.dumps(get_single_item(category_name, item_name))
 
 
 @app.route("/recent-items", methods=["GET"])
 def rest_get_recent_items():
+    # Get the top 10 most recent items
+    # and returns it as a json string
     return json.dumps(get_recent_items())
 
 
 @app.route("/catalog/categories", methods=["GET"])
 def rest_get_categories():
+    # Gets all of the item categoris
+    # and returns them as a json string
     return json.dumps(get_categories())
 
 
 @app.route("/catalog.json", methods=["GET"])
 def rest_json_endpoint():
+    # Gets all items sorted by their category,
+    # and returns them as a json string
     return json.dumps(get_items_by_category())
 
 """
-    Helper Functions
+    Helper Functions ------------------------------------------------
 """
 
 
@@ -620,6 +660,7 @@ def get_user_id(cursor):
 
 
 def connect_to_db(db_name):
+    # Connects to the database
     try:
         conn = psycopg2.connect('dbname=' + str(db_name))
         cursor = conn.cursor()
@@ -638,12 +679,14 @@ def strip_containers(cursor_fetchall):
 
 
 def get_user_email():
+    # Gets the users email address, requires they be signed in
     if 'credentials' in flask.session:
         return json.loads(flask.session['credentials'])['id_token']['email']
     return None
 
 
 def valid_item_name(item_name):
+    # Checks to make sure the item name is valid
     reg = re.compile('^[a-zA-Z0-9_-]+$')
     match = reg.match(item_name)
     if(match is None):
@@ -652,8 +695,9 @@ def valid_item_name(item_name):
     print("valid item name")
     return True
 
+
 """
-    OAuth Functions
+    OAuth Functions -------------------------------------------------
 """
 
 
@@ -666,7 +710,7 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 """
-    Main
+    Main ------------------------------------------------------------
 """
 if __name__ == '__main__':
     # TODO: this is directy from the google guides
