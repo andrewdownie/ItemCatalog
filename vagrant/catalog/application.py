@@ -447,6 +447,32 @@ def delete_item(id):
     print('pre final return')
     return json.dumps({"status": "success", "messages": messages})
 
+def get_items_by_category():
+    conn, cursor = connect_to_db("item_catalog")
+
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'id', category.id,
+        'name', category.name,
+        'Item',
+            (
+            SELECT json_agg(json_build_object(
+                'name', item_contents.name,
+                'id', item_contents.id
+                ))
+                FROM item
+                AS item_contents
+                WHERE category.id = item_contents.category_id
+            )
+    ))
+    FROM category;
+    """)
+
+    #TODO: pack into with "Category" as first key, and everything in a list off of that
+    print("Get items sorted by category")
+    result = strip_containers(cursor.fetchall())
+    conn.close()
+    return result
 
 #####
 #####
@@ -548,6 +574,10 @@ def rest_get_recent_items():
 @app.route("/catalog/categories", methods=["GET"])
 def rest_get_categories():
     return json.dumps(get_categories())
+
+@app.route("/catalog.json", methods=["GET"])
+def rest_json_endpoint():
+    return json.dumps(get_items_by_category())
 
 
 #####
