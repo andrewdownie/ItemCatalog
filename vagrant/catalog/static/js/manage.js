@@ -36,6 +36,11 @@ $(document).ready(function(){
     });
 
 
+    $("#confirm-delete-item").click(function(){
+        DeleteItem();
+    });
+
+
     $("#edit-item-name").on('keyup', function(event){
         ValidateItemName("#edit-item-name", "#confirm-edit-item", "#edit-error-message")
     });
@@ -168,6 +173,34 @@ function EditItem(){
         },
         error: function(data){
             console.log("ajax request failure :: edit item")
+            console.log(data)
+        },
+    });
+}
+
+function DeleteItem(){
+    url="/catalog/deleteitem"
+    
+    console.log("About to send ajax request to delete item");
+
+    item_data = {};
+    item_data.item_id = Number($("#edit-item-name").attr("itemid"))
+
+    $.ajax({
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'POST',
+        url: url, 
+        data: JSON.stringify(item_data),
+        success: function(data){
+            console.log("ajax request success :: delete item")
+            console.log(data)
+
+            $("#item-" + item_data.item_id).remove()
+
+        },
+        error: function(data){
+            console.log("ajax request failure :: delete item")
             console.log(data)
         },
     });

@@ -397,6 +397,69 @@ def edit_item(id, name, category_id, description):
     return json.dumps({"status": "success", "messages": messages})
 
 
+def delete_item(id):
+    messages = []
+
+    conn, cursor = connect_to_db("item_catalog")
+
+    if 'credentials' not in flask.session:
+        messages.append("User not logged in.")
+        return json.dumps({"status": "failure", "messages": messages})
+
+    id = int(id)
+
+    ###
+    ### Get the users id that is currently logged in from their email address
+    ###
+    user_id = None
+    user_email = get_user_email()
+
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'user_id', id
+    )) 
+    FROM users
+    WHERE users.email = %(email)s;
+    """, {"email": user_email})
+
+    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    print("creator is: " + str(user_id))
+
+
+
+    ###
+    ### Make sure the user owns this item
+    ###
+    cursor.execute("""
+    SELECT json_agg(json_build_object(
+        'owner_id', user_id
+    ))
+    FROM item
+    WHERE id=%(item_id)s;
+    """, {"item_id": id})
+
+    owner_id = strip_containers(cursor.fetchall())[0]['owner_id']
+
+    if(owner_id != user_id):
+        print("User does not own this item!")
+        return json.dumps({"status": "failure", "messages": ["User does not own the item they are trying to delete!"]})
+
+
+
+    cursor.execute("""
+    DELETE FROM item
+    WHERE id=%(item_id)s
+    """, {"item_id": id})
+
+    conn.commit()
+    print("update item pls -- after commit")
+
+    conn.close()
+
+    print('pre final return')
+    return json.dumps({"status": "success", "messages": messages})
+
+
 #####
 #####
 #####                   Rest API
@@ -458,6 +521,21 @@ def rest_edit_item():
 
     return json.dumps({"messages": errorList})
 
+@app.route("/catalog/deleteitem", methods=["POST"])
+def rest_delete_item():
+    errorList = []
+
+    data = request.data
+    loaded_data = json.loads(data)
+
+    if("item_id" not in loaded_data):
+        errorList.append("Missing json key: item_id")
+
+    if(len(errorList) == 0):
+        item_id = str(loaded_data["item_id"])
+        return delete_item(item_id) 
+
+    return json.dumps({"messages": errorList})
 
 @app.route("/catalog/item", methods=["GET"])
 def rest_get_items():
