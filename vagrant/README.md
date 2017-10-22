@@ -29,13 +29,15 @@ If the user logs in, they can do everything a logged out user can do on the inde
 
 
 # Getting started with this project
-## Setting up the vagrant environment
+## Copying the vagrant environment
 It is assumed you already have virtual box and vagrant installed.
 ### Download the vagrant environment file:
-Download the vagrant environment file, and put it into a folder (make sure to save it without a file extension).
-https://github.com/udacity/fullstack-nanodegree-vm/blob/master/vagrant/Vagrantfile
-### Download and start the vagrant environment:
-With a terminal, navigate to the folder you created with the vagrant environment file, and run the following command:
+Download the vagrant setup from here (unzip it if needed).
+https://github.com/udacity/fullstack-nanodegree-vm
+### Copy this projects files into the vagrant directory
+Copy the application.py and setup_database.py files into the /vagrant/catalog folder of the fullstack-nanodegree-vm-master
+### Run the vagrant environment
+With a terminal, navigate to the folder /vagrant
 ```bash
 vagrant up
 ```
@@ -46,57 +48,13 @@ vagrant ssh
 ```
 You are now ready to setup the database.
 ## Setting up the database
-### Download the newsdata.zip file:
-https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip
-
-### Extract the newsdata.sql file: 
-Extract the newsdata.sql file from the newsdata.zip into the vagrant folder you created earlier.
-
-From within a terminal ssh session with the vagrant environment, navigate to ```/vagrant``` and run the command line command:
+### Setup the database tables:
+from within vagrant, run: 
 ```
-psql -d news -f newsdata.sql
+python /vagrant/catalog/setup_database.py
 ```
-
-## Creating the required views
-Two views will need to be created in the _news_ database before this program can be run. These views are: article_views and daily_status, and they are listed at the bottom of this readme. 
-
-One method to create the required article_views and daily_status views is from within environment vagrant, enter the database interactively from the command line with: ```psql -d news``` and then copy and paste, the sql code to create the two views. The sql code can be found at the bottom of this file.
-
-
-# Running this project 
-make sure the application.py script from this repo is in the vagrant folder, and run:
-```python
-python3 databaseAnalysis.py
+### Run the application
+From within vagrant, run:
 ```
-
-
-# The views needed for this program are:
-
-## article_views for questions 1 and 2
-```sql
-CREATE VIEW article_views AS 
-SELECT COUNT(REPLACE(path, '/article/', '')), 
-       articles.slug, 
-       articles.title, 
-       articles.author 
-    FROM articles 
-    INNER JOIN log 
-    ON articles.slug 
-    LIKE REPLACE(path, '/article/', '') 
-    GROUP BY articles.slug, articles.id 
-    ORDER BY count DESC;
+python /vagrant/catalog/applicaton.py
 ```
-
-## dailyStatus for question 3
-```sql
-CREATE VIEW daily_status AS
-SELECT COUNT(status),
-          status,
-          LEFT(CAST(time AS TEXT), 10)
-   AS day
-   FROM log
-   GROUP BY day, status;
-```
-
-
-
