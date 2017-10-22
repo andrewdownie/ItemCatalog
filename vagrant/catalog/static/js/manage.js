@@ -130,7 +130,9 @@ function AddItem(){
             if(card_count === 0){
                 $("#item-card-row").empty()
             }
-            $("#item-card-row").prepend(BuildItemCard(data['item_id'], item_data.name, item_data.category, item_data.category_name, item_data.description))
+            if(data.status == "success"){
+                $("#item-card-row").prepend(BuildItemCard(data['item_id'], item_data.name, item_data.category, item_data.category_name, item_data.description))
+            }
         },
         error: function(data){
             console.log("ajax request failure :: add item")

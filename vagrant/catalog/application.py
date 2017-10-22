@@ -257,7 +257,7 @@ def create_item(name, category_id, description):
         return json.dumps({"status": "failure", "messages": errors})
 
     ###
-    ###  Check to make sure name, category and description are valid
+    ### Check to make sure name, category and description are valid
     ###
     name = str(name)
     if(valid_item_name(name) == False):
@@ -271,12 +271,28 @@ def create_item(name, category_id, description):
     date_created = datetime.date.today()
     print(date_created)
 
-    user_email = get_user_email()
+    ###
+    ### Check to make sure an item doesn't already exist with this name
+    ###
+    cursor.execute("""
+    SELECT 
+        COUNT(*)
+    FROM item
+    WHERE item.name= %(name)s;
+    """, {"name": name})
+    count = strip_containers(cursor.fetchall())
+    print("Count was: " + str(count))
+
+    if(count != 0):
+        errors.append("Item with that name already exists.")
+        return json.dumps({"status": "failure", "messages": errors})
+
 
 
     ###
     ### Get the users id that is currently logged in from their email address
     ###
+    user_email = get_user_email()
     user_id = None
 
     cursor.execute("""
