@@ -11,7 +11,7 @@ from flask import request
 
 import httplib2
 
-# To install apiclient: pip install google-api-python-client
+# To install apiclient: sudo pip install google-api-python-client
 from apiclient import discovery
 from oauth2client import client
 
