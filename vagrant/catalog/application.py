@@ -711,6 +711,7 @@ def valid_item_name(item_name):
     print("valid item name")
     return True
 
+
 def create_user():
     user_email = get_user_email()
     conn, cursor = connect_to_db("item_catalog")
