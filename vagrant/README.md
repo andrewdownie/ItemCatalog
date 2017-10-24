@@ -1,6 +1,8 @@
 # About this project
 This project requires vagrant, and virtual box:
+
 https://www.vagrantup.com/ 
+
 https://www.virtualbox.org/wiki/Downloads
 
 
@@ -32,29 +34,60 @@ If the user logs in, they can do everything a logged out user can do on the inde
 ## Copying the vagrant environment
 It is assumed you already have virtual box and vagrant installed.
 ### Download the vagrant environment file:
-Download the vagrant setup from here (unzip it if needed).
+Clone (or download) the vagrant setup from here (unzip it if needed).
 https://github.com/udacity/fullstack-nanodegree-vm
 ### Copy this projects files into the vagrant directory
-Copy the application.py and setup_database.py files into the /vagrant/catalog folder of the fullstack-nanodegree-vm-master
+Copy the following 5 files and folders into the /vagrant folder of the fullstack-nanodegree-vm-master repo:
+application.py
+setup_database.py,
+client_secrets.json
+static/
+templates/
 ### Run the vagrant environment
-With a terminal, navigate to the folder /vagrant
+With a terminal, navigate to the /vagrant folder in the fullstack-nanodegree-vm-master repo you downloaded in the first step, and run the command:
 ```bash
 vagrant up
 ```
+It will now download the vagrant environment.
 ### Ssh into the vagrant environment:
-Once the ```vagrant up``` command has completed, run:
+Once the ```vagrant up``` command from the previous step has completed, run:
 ```bash
 vagrant ssh
 ```
 You are now ready to setup the database.
 ## Setting up the database
+### Create the database:
+To create the database for this project, we will need to enter three commands on the command line in the vagrant ssh session:
+First, enter psql by typing the command:
+```
+psql
+```
+Second, create the database with the command:
+```
+CREATE DATABASE item_catalog;
+```
+Finally, exit psql with the command:
+```
+\q
+```
+### Install Google OAuth python tools
+from withing the vagrant ssh session, run:
+```
+sudo pip install google-api-python-client
+```
 ### Setup the database tables:
-from within vagrant, run: 
+from within the vagrant ssh session, run: 
 ```
 python /vagrant/catalog/setup_database.py
 ```
 ### Run the application
 From within vagrant, run:
 ```
-python /vagrant/catalog/applicaton.py
+python /vagrant/catalog/application.py
 ```
+### Visit the website
+In your host OS open a webbrowser, and navigate to the url
+```
+localhost:8000
+```
+You should now be able to view and use the website.

@@ -270,7 +270,7 @@ def get_owned_items():
     )
 
     results = strip_containers(cursor.fetchall())
-    if(results is None):
+    if(results):
         results.reverse()
 
     conn.close()

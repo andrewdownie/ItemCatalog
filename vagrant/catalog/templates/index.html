@@ -26,13 +26,15 @@
                                 Recent Items
                             </a>
                         </h3>
-                    {% for category in categories%}
-                        <h3>
-                            <a class="category-link" id="{{ category['category_id'] }}" href="#">
-                                {{ category['category_name'] }}
-                            </a>
-                        </h3>
-                    {% endfor %}
+                    {% if categories %}
+                        {% for category in categories%}
+                            <h3>
+                                <a class="category-link" id="{{ category['category_id'] }}" href="#">
+                                    {{ category['category_name'] }}
+                                </a>
+                            </h3>
+                        {% endfor %}
+                    {% endif %}
                     <br>
                     <br>
                 </div>
@@ -40,8 +42,8 @@
                 <div id="items-col" class="col-md-8">
                     <h2 class="page-header" id="items-header">{{ current_category }}</h2>
                     <div id="items-container">
-                    {%if items != None%}
-                        {%for item in items%}
+                    {% if items %}
+                        {% for item in items %}
                         <div>
                             <a href="#" id="{{ item['item_id'] }}" class="item-link"><h4>{{ item['item_name'] }}</h4></a>
                             Category: <span class="item-category">{{ item['category_name'] }}</span>
