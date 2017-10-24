@@ -28,14 +28,13 @@ CATEGORY_TABLE = """
 
 USER_TABLE = """
     CREATE TABLE users(
-        name text,
         email text,
         id SERIAL,
         PRIMARY KEY (id)
     );
 """
 
-ADD_CATEGORy = """
+ADD_CATEGORY = """
 INSERT INTO category
 (name, description)
 VALUES(%(name)s, %(description)s);
@@ -43,7 +42,7 @@ VALUES(%(name)s, %(description)s);
 
 
 def create_tables():
-    conn, cursor = connect_to_db('item_catalog')
+    conn, cursor = connect_to_db("item_catalog")
 
     cursor.execute(USER_TABLE)
     cursor.execute(CATEGORY_TABLE)

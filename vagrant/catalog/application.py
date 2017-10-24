@@ -53,6 +53,9 @@ def oauth2callback():
         auth_code = flask.request.args.get('code')
         credentials = flow.step2_exchange(auth_code)
         flask.session['credentials'] = credentials.to_json()
+
+        create_user()
+
         return flask.redirect(flask.url_for('view_recent_items'))
 
 
@@ -320,6 +323,8 @@ def create_item(name, category_id, description):
     # Get the users id that is currently logged in from their email address
     user_email = get_user_email()
     user_id = get_user_id(cursor)
+    if(user_id is None):
+        print("user_id is None")
     print("creator is: " + str(user_id))
 
     # Check if the item name already exists
@@ -387,6 +392,8 @@ def edit_item(id, name, category_id, description):
 
     # Get the users id that is currently logged in from their email address
     user_id = get_user_id(cursor)
+    if(user_id is None):
+        print("user_id is None")
     print("creator is: " + str(user_id))
 
     # Make sure the user owns this item
@@ -447,6 +454,8 @@ def delete_item(id):
 
     # Get the users id that is currently logged in from their email address
     user_id = get_user_id(cursor)
+    if(user_id is None):
+        print("user_id is None")
     print("creator is: " + str(user_id))
 
     # Make sure the user owns this item
@@ -655,7 +664,14 @@ def get_user_id(cursor):
     WHERE users.email = %(email)s;
     """, {"email": user_email})
 
-    user_id = strip_containers(cursor.fetchall())[0]['user_id']
+    result = cursor.fetchall()
+    if(result is None):
+        return result
+
+    user_row = strip_containers(result)
+    if(user_row is None):
+        return None
+    user_id = user_row[0]['user_id']
     return user_id
 
 
@@ -694,6 +710,25 @@ def valid_item_name(item_name):
         return False
     print("valid item name")
     return True
+
+def create_user():
+    user_email = get_user_email()
+    conn, cursor = connect_to_db("item_catalog")
+
+    cursor.execute("""
+    SELECT * FROM users
+    WHERE email=%(email)s;
+    """, {"email": user_email})
+    result = cursor.fetchall()
+
+    if(len(result) == 0):
+        cursor.execute("""
+        INSERT INTO users
+        (email)
+        VALUES(%(email)s)
+        """, {"email": user_email})
+        conn.commit()
+    conn.close()
 
 
 """

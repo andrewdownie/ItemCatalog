@@ -38,11 +38,11 @@ Clone (or download) the vagrant setup from here (unzip it if needed).
 https://github.com/udacity/fullstack-nanodegree-vm
 ### Copy this projects files into the vagrant directory
 Copy the following 5 files and folders into the /vagrant folder of the fullstack-nanodegree-vm-master repo:
-application.py
-setup_database.py,
-client_secrets.json
-static/
-templates/
+- application.py
+- setup_database.py
+- client_secrets.json
+- static/
+- templates/
 ### Run the vagrant environment
 With a terminal, navigate to the /vagrant folder in the fullstack-nanodegree-vm-master repo you downloaded in the first step, and run the command:
 ```bash
@@ -76,14 +76,14 @@ from withing the vagrant ssh session, run:
 sudo pip install google-api-python-client
 ```
 ### Setup the database tables:
-from within the vagrant ssh session, run: 
+from within the vagrant ssh session, in the /vagrant/catalog folder run: 
 ```
-python /vagrant/catalog/setup_database.py
+python setup_database.py
 ```
 ### Run the application
-From within vagrant, run:
+From within vagrant, in the /vagrant/catalog folder run:
 ```
-python /vagrant/catalog/application.py
+python application.py
 ```
 ### Visit the website
 In your host OS open a webbrowser, and navigate to the url
